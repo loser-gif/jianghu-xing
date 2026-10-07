@@ -2,6 +2,8 @@
 
 手机竖屏优先的文字武侠 RPG。首个可玩篇章以杭州与《烟雨楼盗案》为核心，用探索、人物关系、武学与捕快身份串起一段可以保存的江湖故事。
 
+[在线试玩](https://loser-gif.github.io/jianghu-xing/) · [源码仓库](https://github.com/loser-gif/jianghu-xing)
+
 ## 本地运行
 
 需要 Node.js 22.12 或更新版本。
@@ -73,7 +75,7 @@ tests/game.test.ts    核心流程、失败路径、养成及存档测试
 
 ## 部署至 GitHub Pages
 
-已提供 `.github/workflows/deploy.yml`：推送 `main` 后运行安装、测试、构建及 Pages 发布。仓库设置中的 Pages Source 需选择 GitHub Actions。仓库需支持 GitHub Pages；当前未绑定远程仓库，尚未发布线上版本。
+已提供 `.github/workflows/deploy.yml`：推送 `main` 后运行安装、测试、构建及 Pages 发布。GitHub 仓库为 `loser-gif/jianghu-xing`，Pages Source 已设为 GitHub Actions，首轮自动部署成功。
 
 所有运行时图片均为本地资源；字体使用系统宋体与楷体回退，不依赖外部字体 CDN。浏览器首次加载只需约 1 MB 水墨素材，另有应用代码。原始生成稿不放在生产资源目录内。
 
@@ -86,3 +88,4 @@ tests/game.test.ts    核心流程、失败路径、养成及存档测试
 这是首个杭州可玩版本。暂未开放其他城市、总捕及锦衣卫，也未加入后端账户、云存档、多人交互或离线 PWA 缓存。强化暂为最高 +5 的确定性重铸，完整锻造扩展与更多套装留待内容迭代。战斗数值为首轮基线，仍需真实试玩调整。
 
 美术遵循用户确认：排除深色雨夜版 Figure 3–7，以其余宣纸水墨参考建立可交互界面。角色、场景为内置 ImageGen 生成的新素材，布局和配色依参考制作，非将参考图整张贴成页面。素材提示词和映射见 `ART_DIRECTION.md`。
+
