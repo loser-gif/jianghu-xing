@@ -1,0 +1,7 @@
+{
+  "asset": "mountain-moon.png",
+  "source": "public/reference/figure-1.jpg, first/top-left main-menu panel",
+  "method": "Built-in imagegen reference-guided illustration restoration and removal of all embedded UI and text",
+  "date": "2026-10-07",
+  "notes": "Retains the reference composition of moon, mountains, pagoda, solitary swordsman and cliff. Reconstructed illustration, not a pixel-exact original crop. All title lettering, chapter labels, menu controls and save information are rendered separately by MainMenu.tsx. Excluded dark inn Figures 3–7 were not used."
+}

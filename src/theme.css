@@ -1647,40 +1647,6 @@ dialog::backdrop {
   text-align: center;
   margin: 20px 0;
 }
-.main-menu {
-  padding: 18px 42px 45px;
-  max-width: 560px;
-  margin: auto;
-  text-align: center;
-}
-.menu-verse {
-  font:
-    20px/2 "SimSun",
-    serif;
-  letter-spacing: 2px;
-  margin: 15px 0 32px;
-}
-.menu-buttons {
-  display: grid;
-  gap: 14px;
-  margin: 20px 0 28px;
-}
-.menu-buttons .button {
-  min-height: 58px;
-  justify-content: flex-start;
-}
-.menu-buttons .button svg:last-child {
-  margin-left: auto;
-}
-.menu-seal {
-  writing-mode: vertical-rl;
-  color: var(--red);
-  border: 2px solid var(--red);
-  padding: 7px 5px;
-  letter-spacing: 4px;
-  margin-top: 30px;
-  font-family: "SimSun", serif;
-}
 .game-dialog {
   width: min(620px, calc(100% - 24px));
 }
@@ -2744,12 +2710,6 @@ dialog::backdrop {
   }
   .game-paper h1:not(.heading-title h1) {
     font-size: 28px;
-  }
-  .main-menu {
-    padding: 10px 24px 35px;
-  }
-  .menu-verse {
-    font-size: 18px;
   }
   .utility-nav {
     grid-template-columns: repeat(2, 1fr);
@@ -3839,6 +3799,328 @@ dialog::backdrop {
 }
 .nav-corners .art {
   mask-image: linear-gradient(0deg, #000 64%, transparent);
+}
+
+/* Figure 1 opening: clean painting with live calligraphy and menu controls. */
+.game-layout.opening-layout {
+  max-width: 760px;
+}
+.game-paper.opening-paper {
+  min-height: 0;
+  background: #47585c;
+}
+.opening-menu {
+  position: relative;
+  isolation: isolate;
+  min-height: 820px;
+  height: calc(100svh - 48px);
+  max-height: 1040px;
+  overflow: hidden;
+  background: linear-gradient(#abb7b8, #e1e1d3 35%, #263b40 78%);
+}
+.opening-menu:after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px solid #e8dcc04d;
+  outline: 1px solid #283a4152;
+  outline-offset: 3px;
+  pointer-events: none;
+  z-index: 3;
+}
+.opening-painting,
+.opening-wash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+.opening-painting {
+  display: block;
+  object-fit: cover;
+  object-position: 46% top;
+}
+.opening-wash {
+  background: linear-gradient(
+    180deg,
+    #eee9d617,
+    transparent 32%,
+    transparent 70%,
+    #14252c80 100%
+  );
+}
+.opening-heading {
+  position: absolute;
+  left: 10%;
+  top: 5%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.game-paper.opening-paper .opening-heading h1 {
+  display: flex;
+  flex-direction: column;
+  font:
+    108px/1.06 DocumentBrush,
+    "STKaiti",
+    "KaiTi",
+    serif;
+  color: #1f2b2b;
+  margin: 0;
+  text-shadow: 0 1px 15px #eee9d659;
+}
+.opening-heading h1 span:nth-child(2) {
+  transform: translateX(8px);
+}
+.opening-heading h1 span:nth-child(3) {
+  transform: translateX(-5px);
+}
+.opening-seal {
+  writing-mode: vertical-rl;
+  background: #9b4438;
+  color: #f8e7ce;
+  outline: 1px solid #d6a58c;
+  outline-offset: -4px;
+  padding: 10px 7px;
+  border-radius: 3px 1px 4px 2px;
+  font:
+    16px/1.3 "SimSun",
+    serif;
+  letter-spacing: 3px;
+  align-self: end;
+  margin: 0 0 28px -4px;
+}
+.opening-verse {
+  position: absolute;
+  isolation: isolate;
+  left: 56%;
+  top: 32%;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 12px;
+  color: #273837;
+  font:
+    18px/1.6 "SimSun",
+    serif;
+}
+.opening-verse:before {
+  content: "";
+  position: absolute;
+  inset: -14px -18px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse, #efead8d9 35%, transparent 74%);
+}
+.opening-verse span {
+  writing-mode: vertical-rl;
+  letter-spacing: 5px;
+  text-shadow: 0 0 8px #eeeada;
+}
+.opening-actions {
+  position: absolute;
+  bottom: 88px;
+  right: 7%;
+  width: 43%;
+  display: grid;
+  gap: 8px;
+  color: #f5ebd6;
+}
+.opening-actions:before {
+  content: "";
+  position: absolute;
+  inset: -15px -28px -24px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse,
+    #192b32cc 10%,
+    #192b3290 62%,
+    transparent 74%
+  );
+}
+.opening-chapter {
+  width: fit-content;
+  padding: 4px 8px;
+  background: linear-gradient(90deg, #23383de0, #23383d70);
+  font:
+    14px/1.7 "Microsoft YaHei",
+    sans-serif;
+  letter-spacing: 2px;
+  color: #eadcba;
+  margin-bottom: 5px;
+  text-shadow: 0 1px 4px #14232c;
+}
+.opening-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 12px;
+  padding: 10px 14px;
+  min-height: 54px;
+  color: #f5ebd6;
+  background: linear-gradient(90deg, #1a2c3370, #1a2c3320);
+  border-bottom: 1px solid #bdae8852;
+  font:
+    23px/1.45 "STKaiti",
+    "KaiTi",
+    "SimSun",
+    serif;
+  text-shadow: 0 1px 3px #182b31;
+}
+.opening-action > span:not(.opening-diamond) {
+  min-width: 0;
+  flex: 1;
+}
+.opening-action small {
+  display: block;
+  color: #e2dccd;
+  font:
+    14px/1.65 "Microsoft YaHei",
+    sans-serif;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.opening-primary {
+  min-height: 70px;
+  background: #23373de8;
+  border-bottom-color: transparent;
+}
+.opening-primary:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 8px solid transparent;
+  border-image: url("/art/ui/gold-frame.svg") 12 / 8px stretch;
+  pointer-events: none;
+}
+.opening-action:enabled:hover {
+  color: #fff5d9;
+  background-color: #4b5a56d9;
+}
+.opening-action:focus-visible {
+  outline: 2px solid #f2da9e;
+  outline-offset: 3px;
+}
+.opening-action:disabled {
+  color: #b9c1bd;
+  background: #21313770;
+}
+.opening-diamond {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #cab57f;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+.opening-primary .opening-diamond {
+  background: #c5ad78;
+  box-shadow: 0 0 0 3px #c5ad7826;
+}
+.opening-progress {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #e0e2d6;
+  padding: 4px 0;
+  text-shadow: 0 1px 3px #162930;
+}
+.opening-footer {
+  position: absolute;
+  bottom: max(26px, env(safe-area-inset-bottom));
+  left: 7%;
+  right: 7%;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  font:
+    14px/1.8 "SimSun",
+    serif;
+  letter-spacing: 3px;
+  color: #f0e3c3;
+  text-shadow: 0 1px 4px #14252c;
+}
+.opening-footer span {
+  height: 1px;
+  flex: 1;
+  max-width: 60px;
+  background: linear-gradient(90deg, transparent, #d3bd86);
+}
+.opening-footer span:last-child {
+  transform: rotate(180deg);
+}
+@media (max-width: 600px) {
+  .game-layout.opening-layout {
+    padding: 0;
+  }
+  .opening-menu {
+    min-height: 760px;
+    height: 100svh;
+    max-height: none;
+  }
+  .opening-heading {
+    top: 4.5%;
+    left: 7%;
+    gap: 7px;
+  }
+  .game-paper.opening-paper .opening-heading h1 {
+    font-size: 84px;
+  }
+  .opening-seal {
+    font-size: 14px;
+    padding: 8px 6px;
+    margin-bottom: 20px;
+  }
+  .opening-verse {
+    left: 56%;
+    top: 30%;
+    font-size: 16px;
+    gap: 9px;
+  }
+  .opening-actions {
+    right: 6%;
+    width: 48%;
+    gap: 7px;
+  }
+  .opening-action {
+    font-size: 20px;
+    gap: 9px;
+    padding: 10px 10px;
+    min-height: 50px;
+  }
+  .opening-primary {
+    min-height: 70px;
+  }
+  .opening-chapter {
+    letter-spacing: 0;
+  }
+  .opening-footer {
+    letter-spacing: 2px;
+    gap: 10px;
+  }
+}
+@media (max-width: 350px) {
+  .opening-actions {
+    width: 51%;
+    right: 5%;
+  }
+  .opening-action {
+    font-size: 18px;
+    gap: 7px;
+    padding: 10px 9px;
+  }
+  .game-paper.opening-paper .opening-heading h1 {
+    font-size: 76px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .opening-menu {
+    min-height: 680px;
+  }
 }
 .profile-vignette .vignette-art {
   mask-image:

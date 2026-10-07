@@ -7,6 +7,7 @@ import {
 } from "react";
 import { InkNavIcon, PaperEnding, NavCorners } from "./components/InkOrnaments";
 import { Creation } from "./pages/Creation";
+import { MainMenu } from "./pages/MainMenu";
 import { Jianghu } from "./pages/Jianghu";
 import { Character } from "./pages/Character";
 import { Martial } from "./pages/Martial";
@@ -24,7 +25,7 @@ import {
   Equipment,
   ItemDialog,
 } from "./components/InkUI";
-import { Icon, Button, Modal, ActionRow } from "./components/UI";
+import { Icon, Modal, ActionRow } from "./components/UI";
 import { Relations } from "./pages/Relations";
 import { useGame } from "./store";
 import { locations, timeLabel } from "./data/world";
@@ -91,50 +92,20 @@ export default function App() {
     event
   );
   return (
-    <div className="game-layout">
-      <main className="paper game-paper" ref={heading} tabIndex={-1}>
+    <div className={`game-layout ${screen === "menu" ? "opening-layout" : ""}`}>
+      <main
+        className={`paper game-paper ${screen === "menu" ? "opening-paper" : ""}`}
+        ref={heading}
+        tabIndex={-1}
+      >
         {screen === "menu" ? (
-          <>
-            <Header title="江湖行" subtitle="一纸江湖 · 万般人生" />
-            <section className="main-menu">
-              <p className="menu-verse">
-                千山万水，因人而有故事。
-                <br />
-                这一程江湖，等你落笔。
-              </p>
-              <div className="menu-buttons">
-                <Button kind="ink" onClick={() => setScreen("create")}>
-                  <Icon name="feather" />
-                  开始江湖
-                  <Icon name="right" />
-                </Button>
-                <Button disabled={!s.started} onClick={() => setScreen("game")}>
-                  <Icon name="mountain" />
-                  继续游历
-                  <Icon name="right" />
-                </Button>
-                <Button onClick={() => setSaveOpen(true)}>
-                  <Icon name="save" />
-                  存档与设置
-                  <Icon name="right" />
-                </Button>
-                <Button onClick={() => setHelp(true)}>
-                  <Icon name="book" />
-                  初入江湖须知
-                  <Icon name="right" />
-                </Button>
-              </div>
-              {s.started && (
-                <p className="secondary">
-                  {s.player.name} ·{" "}
-                  {locations.find((l) => l.id === s.location)?.name}
-                  <br />
-                  {timeLabel(s.time)} · 续写上次的故事
-                </p>
-              )}
-              <span className="menu-seal">杭州篇</span>
-            </section>
-          </>
+          <MainMenu
+            s={s}
+            onStart={() => setScreen("create")}
+            onContinue={() => setScreen("game")}
+            onSave={() => setSaveOpen(true)}
+            onHelp={() => setHelp(true)}
+          />
         ) : screen === "create" ? (
           <>
             <Header title="初入江湖" subtitle="定下名姓，自立身世" />
