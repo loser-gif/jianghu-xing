@@ -300,13 +300,15 @@ export function Modal({
         tabIndex={-1}
         ref={ref}
       >
-        <div className="modal-heading">
-          <ReferenceHeader title={title} />
-          {onClose && (
+        {onClose && (
+          <div className="modal-close-bar">
             <button aria-label="关闭" className="icon-button" onClick={onClose}>
               <Icon name="close" />
             </button>
-          )}
+          </div>
+        )}
+        <div className="modal-heading">
+          <ReferenceHeader title={title} />
         </div>
         <div className="modal-body">{children}</div>
       </div>

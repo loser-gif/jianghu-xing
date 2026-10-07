@@ -111,7 +111,7 @@ export function ReferencePortrait({
   const [figure, rect] = portraits[index] || portraits[6];
   return (
     <div className={`portrait ${size} ${className}`}>
-      <ReferenceArt figure={figure} rect={rect} label="文档原画人物肖像" />
+      <ReferenceArt figure={figure} rect={rect} label="人物肖像" />
     </div>
   );
 }
@@ -171,12 +171,12 @@ export function InkEdges() {
       />
       <ReferenceArt
         figure={8}
-        rect={[0, 1455, 185, 55]}
+        rect={[0, 1455, 60, 55]}
         className="edge-bottom-left"
       />
       <ReferenceArt
         figure={8}
-        rect={[754, 1397, 96, 113]}
+        rect={[798, 1397, 52, 113]}
         className="edge-right"
       />
     </div>

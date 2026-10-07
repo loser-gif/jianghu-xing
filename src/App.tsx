@@ -19,7 +19,7 @@ import {
   ReferenceNavIcon,
   InkEdges,
 } from "./components/Reference";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useLayoutEffect } from "react";
 import { useGame } from "./store";
 import { locations, origins, timeLabel, stageLabels } from "./data/world";
 import { events } from "./data/events";
@@ -70,11 +70,10 @@ export default function App() {
     closeHelp = useCallback(() => setHelp(false), []);
   const navigate = (p: Page) => {
     setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, [screen]);
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [screen, page]);
   const d = derived(s);
   const event = events.find((e) => e.id === s.activeEvent);
   const [notice, setNotice] = useState("");
