@@ -6,6 +6,7 @@ import {
   npcs,
   items,
   npcLocation,
+  shopStock,
 } from "../data/world";
 import { events } from "../data/events";
 
@@ -367,16 +368,7 @@ export function transition(current: GameState, action: Action): GameState {
     }
     case "buy": {
       const item = items.find((i) => i.id === action.id);
-      const shop =
-        s.location === "smith"
-          ? ["sword", "saber", "glove", "fan", "robe", "boots", "iron"]
-          : s.location === "herb"
-            ? ["medicine", "herb"]
-            : s.location === "inn"
-              ? ["wine", "tea"]
-              : s.location === "office"
-                ? ["rope", "cloth", "charm"]
-                : [];
+      const shop = shopStock(s.location);
       if (!item || !shop.includes(item.id)) break;
       if (s.time % 6 === 5 && !["office", "herb"].includes(s.location)) {
         note(s, "此刻已是深夜，店家已经打烊。");

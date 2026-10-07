@@ -3,7 +3,7 @@ import { derived } from "../engine/game";
 import { useState, useEffect } from "react";
 import { relationLabel } from "../engine/game";
 import { useGame } from "../store";
-import { locations, npcs, items, npcLocation } from "../data/world";
+import { locations, npcs, items, npcLocation, shopStock } from "../data/world";
 import { Icon, Portrait, Section, Button, ActionRow } from "../components/UI";
 import type { GameState, NPC, Page } from "../types";
 
@@ -23,16 +23,9 @@ export function Jianghu({
       npcLocation(n, s.time) === s.location &&
       (n.id !== "gu" || ["dock", "combat", "defeated"].includes(s.quest.stage)),
   );
-  const shop =
-    s.location === "smith"
-      ? ["sword", "saber", "boots", "iron"]
-      : s.location === "herb"
-        ? ["medicine", "herb"]
-        : s.location === "inn"
-          ? ["wine", "tea"]
-          : s.location === "office"
-            ? ["rope", "cloth", "charm"]
-            : [];
+  const shop = shopStock(s.location);
+  const shopClosed =
+    s.time % 6 === 5 && !["office", "herb"].includes(s.location);
   const [shopOpen, setShopOpen] = useState(false);
   useEffect(() => setShopOpen(false), [s.location]);
   return (
@@ -187,6 +180,11 @@ export function Jianghu({
       </Section>
       {shopOpen && (
         <Section title={s.location === "office" ? "官府军需" : "柜上物什"}>
+          {shopClosed && (
+            <p className="service-hint" role="status">
+              店家已打烊，等天亮后再来置办。
+            </p>
+          )}
           <div className="shop-list">
             {shop.map((id) => {
               const i = items.find((i) => i.id === id)!;
@@ -214,7 +212,7 @@ export function Jianghu({
                   </span>
                   <Button
                     onClick={() => act({ type: "buy", id })}
-                    disabled={s.player.silver < price}
+                    disabled={shopClosed || s.player.silver < price}
                   >
                     {price} 两 · 买入
                   </Button>

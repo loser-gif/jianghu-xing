@@ -497,3 +497,37 @@ textarea {
 .profile-functions b {
   font-size: 10px;
 }
+
+/* Contextual actions stay near the control that produced them. */
+.service-hint {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #665e4d;
+  margin-top: 9px;
+}
+.npc-feedback {
+  font-size: 12px;
+  margin: 8px 0 0;
+  padding: 8px;
+}
+.save-slots .save-confirm {
+  flex-basis: 100%;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 12px;
+  scroll-margin-block: 58px 12px;
+}
+.save-slots .save-confirm p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.save-slots .save-confirm .button {
+  margin-top: 6px;
+}
+.save-slots .save-confirm:focus {
+  outline: 1px solid #8c7752;
+  outline-offset: 2px;
+}
+.inline-feedback {
+  scroll-margin-block: 58px calc(var(--nav-height) + var(--safe-bottom) + 48px);
+}

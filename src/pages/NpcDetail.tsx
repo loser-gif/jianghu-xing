@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useGame } from "../store";
-import { locations, items, npcLocation } from "../data/world";
+import { locations, items } from "../data/world";
+import { currentNpcLocation, npcService } from "../engine/people";
 import {
   Icon,
   Portrait,
@@ -30,27 +31,39 @@ export function NpcDetail({
 }) {
   const act = useGame((x) => x.act),
     r = s.relationships[n.id],
-    here = npcLocation(n, s.time) === s.location;
+    position = currentNpcLocation(n, s),
+    here = position === s.location;
   const [tab, setTab] = useState("资料");
+  const [feedback, setFeedback] = useState("");
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (feedback) feedbackRef.current?.scrollIntoView({ block: "nearest" });
+  }, [feedback]);
+  const serviceInfo = npcService(n, s);
+  const servicePlace = locations.find(
+    (l) => l.id === serviceInfo.location,
+  )?.name;
+  const needsTravel =
+    !!serviceInfo.location && serviceInfo.location !== s.location;
+  const giftName = items.find((i) => i.id === n.gift)?.name;
   const place =
     n.id === "gu" && s.quest.stage === "completed"
       ? "官府 · 在押"
-      : locations.find((l) => l.id === npcLocation(n, s.time))?.name;
+      : locations.find((l) => l.id === position)?.name;
   const visit = () => {
-    act({ type: "move", id: npcLocation(n, s.time) });
+    act({ type: "move", id: position });
     onClose();
     navigate("jianghu");
   };
-  const service = () =>
-    navigate(
-      n.id === "lu"
-        ? "identity"
-        : n.id === "suwan"
-          ? "jianghu"
-          : n.id === "shao"
-            ? "inventory"
-            : "arts",
-    );
+  const service = () => {
+    if (needsTravel) act({ type: "move", id: serviceInfo.location! });
+    onClose();
+    navigate(serviceInfo.page);
+  };
+  const interact = (type: "talk" | "gift") => {
+    act({ type, id: n.id });
+    setFeedback(useGame.getState().game.lastMessage);
+  };
   return (
     <Modal title="人物谱" onClose={onClose} wide>
       <div className="npc-hero">
@@ -110,7 +123,7 @@ export function NpcDetail({
               <div className="profile-functions">
                 <button
                   disabled={!here || n.id === "gu"}
-                  onClick={() => act({ type: "talk", id: n.id })}
+                  onClick={() => interact("talk")}
                 >
                   <Icon name="feather" />
                   <b>交谈问候</b>
@@ -124,42 +137,44 @@ export function NpcDetail({
                   disabled={
                     !here || n.id === "gu" || !(s.inventory[n.gift] > 0)
                   }
-                  onClick={() => act({ type: "gift", id: n.id })}
+                  onClick={() => interact("gift")}
                 >
                   <Icon name="wine" />
                   <b>赠送心意</b>
                   <small>
-                    {items.find((i) => i.id === n.gift)?.name}
+                    {giftName}
                     <br />
-                    结交故人
+                    持有 ×{s.inventory[n.gift] || 0}
                   </small>
                 </button>
                 <button onClick={service}>
-                  <Icon
-                    name={
-                      n.id === "shao"
-                        ? "hammer"
-                        : n.id === "lu"
-                          ? "shield"
-                          : "book"
-                    }
-                  />
-                  <b>
-                    {n.id === "lu"
-                      ? "身份司簿"
-                      : n.id === "suwan"
-                        ? "客栈歇脚"
-                        : n.id === "shao"
-                          ? "锻造装备"
-                          : "请教武学"}
-                  </b>
+                  <Icon name={serviceInfo.icon} />
+                  <b>{serviceInfo.label}</b>
                   <small>
-                    各有所长
+                    {needsTravel ? `前往${servicePlace}` : "查看详情"}
                     <br />
-                    相助江湖
+                    {needsTravel ? "行程一时辰" : "此处可办"}
                   </small>
                 </button>
               </div>
+              <p className="service-hint">
+                {n.id === "gu"
+                  ? "案中人物，交谈与赠礼暂不可用，请查看案情。"
+                  : !here
+                    ? `交谈与赠礼需当面进行，此刻可往${place}寻访。`
+                    : !(s.inventory[n.gift] > 0)
+                      ? `赠礼还需${giftName}，可先去商铺置办。`
+                      : "可交谈或赠礼，每次相处会推进一个时辰。"}
+              </p>
+              {feedback && (
+                <div
+                  className="inline-feedback npc-feedback"
+                  ref={feedbackRef}
+                  role="status"
+                >
+                  {feedback}
+                </div>
+              )}
             </Section>
             <Section title="人物小传">
               <p className="npc-biography">
@@ -208,7 +223,12 @@ export function NpcDetail({
                 ) : (
                   <p>◇ 故人的来处，尚待你亲自问起。</p>
                 )}
-                <p>◇ 此刻可往{place}寻访，江湖上的人，总有自己的行程。</p>
+                <p>
+                  ◇{" "}
+                  {n.id === "gu" && s.quest.stage === "completed"
+                    ? "此案已结，顾红绫已押送官府。"
+                    : `此刻可往${place}寻访，江湖上的人，总有自己的行程。`}
+                </p>
               </div>
             </Section>
             <ReferenceArt
@@ -245,9 +265,6 @@ export function NpcDetail({
           前往{place}寻访 <Icon name="right" size={14} />
         </Button>
       )}
-      <div className="inline-feedback" role="status">
-        {s.lastMessage}
-      </div>
       <nav className="mobile-nav detail-nav" aria-label="详情导航">
         <InkEdges />
         {(

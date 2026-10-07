@@ -506,5 +506,14 @@ export const stageLabels: Record<string, string> = {
 export const itemById = (id: string) => items.find((i) => i.id === id)!;
 export const npcLocation = (n: NPC, time: number) =>
   time % 6 === 5 && n.nightLocation ? n.nightLocation : n.location;
+export const shopStock = (location: string): string[] => {
+  const stock: Record<string, string[]> = {
+    smith: ["sword", "saber", "glove", "fan", "robe", "boots", "iron"],
+    herb: ["medicine", "herb"],
+    inn: ["wine", "tea"],
+    office: ["rope", "cloth", "charm"],
+  };
+  return stock[location] || [];
+};
 export const timeLabel = (time: number) =>
   `九月${7 + Math.floor(time / 6)}日 · ${periods[time % 6]}`;

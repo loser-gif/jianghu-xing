@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { locations, npcs, npcLocation } from "../data/world";
+import { locations, npcs } from "../data/world";
+import { currentNpcLocation } from "../engine/people";
 import { Icon, Portrait } from "../components/UI";
 import type { GameState, NPC } from "../types";
 import { relationLabel } from "../engine/game";
@@ -20,7 +21,7 @@ export function People({
       (category === "全部" ||
         n.category === category ||
         (category === "同伴" && s.relationships[n.id].trust >= 55)) &&
-      (n.name + n.role + n.tags.join("")).includes(query),
+      (n.name + n.role + n.tags.join("")).includes(query.trim()),
   );
   return (
     <>
@@ -151,7 +152,7 @@ export function People({
                     <Icon name="compass" size={13} />
                     {n.id === "gu" && s.quest.stage === "completed"
                       ? "官府 · 在押"
-                      : locations.find((l) => l.id === npcLocation(n, s.time))
+                      : locations.find((l) => l.id === currentNpcLocation(n, s))
                           ?.name}
                   </span>
                   <span
