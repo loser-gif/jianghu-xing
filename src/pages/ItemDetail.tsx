@@ -1,3 +1,4 @@
+import { ItemArt } from "../components/Reference";
 import { useGame } from "../store";
 import { items } from "../data/world";
 import { Icon, Button, Section, Modal } from "../components/UI";
@@ -19,10 +20,10 @@ export function ItemDetail({
   const equipped = Object.values(s.equipped).includes(i.id);
   const current = items.find((x) => x.id === s.equipped[i.slot || ""]);
   return (
-    <Modal title="物中江湖" onClose={onClose}>
+    <Modal title="装备详情" onClose={onClose}>
       <div className="item-detail-hero">
         <div className="item-illustration">
-          <Icon name={i.icon} size={86} />
+          <ItemArt icon={i.icon} />
         </div>
         <div>
           <span className="eyebrow">

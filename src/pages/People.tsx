@@ -3,6 +3,7 @@ import { locations, npcs, npcLocation } from "../data/world";
 import { Icon, Portrait } from "../components/UI";
 import type { GameState, NPC } from "../types";
 import { relationLabel } from "../engine/game";
+import { ReferenceHeader } from "../components/Reference";
 
 export function People({
   s,
@@ -23,6 +24,7 @@ export function People({
   );
   return (
     <>
+      {view === "relations" && <ReferenceHeader title="羁绊图" />}
       <div className="toolbar">
         <label className="search-field">
           <Icon name="search" size={18} />
@@ -138,7 +140,6 @@ export function People({
                     </span>
                     <span className="person-role">{n.role}</span>
                   </div>
-                  <p>{n.description}</p>
                   <div className="person-tags">
                     {n.tags.map((t) => (
                       <span key={t}>{t}</span>
@@ -158,9 +159,7 @@ export function People({
                   >
                     {relationLabel(r)}
                   </span>
-                  <span className="person-meter">
-                    <i style={{ width: `${r.favor}%` }} />
-                  </span>
+                  <p className="person-quote">“{n.quote}”</p>
                 </div>
                 <Icon name="right" size={17} />
               </button>

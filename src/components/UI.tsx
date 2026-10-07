@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { ReactNode, CSSProperties } from "react";
+import { ReferenceHeader, ReferencePortrait } from "./Reference";
+import type { ReactNode } from "react";
 import {
   Mountain,
   Compass,
@@ -109,7 +110,7 @@ export function Icon({
   return <C size={size} strokeWidth={1.45} aria-hidden="true" {...props} />;
 }
 export function Portrait({
-  index = 3,
+  index = 6,
   size = "medium",
   className = "",
 }: {
@@ -117,19 +118,7 @@ export function Portrait({
   size?: string;
   className?: string;
 }) {
-  return (
-    <div
-      role="img"
-      aria-label="水墨人物肖像"
-      className={`portrait ${size} ${className}`}
-      style={
-        {
-          "--px": `${(index % 3) * 50}%`,
-          "--py": `${Math.floor(index / 3) * 100}%`,
-        } as CSSProperties
-      }
-    />
-  );
+  return <ReferencePortrait index={index} size={size} className={className} />;
 }
 export function Seal({ children }: { children: ReactNode }) {
   return <span className="seal">{children}</span>;
@@ -311,15 +300,14 @@ export function Modal({
         tabIndex={-1}
         ref={ref}
       >
-        <header>
-          <span className="eyebrow">江 湖 手 卷</span>
-          <h2>{title}</h2>
+        <div className="modal-heading">
+          <ReferenceHeader title={title} />
           {onClose && (
             <button aria-label="关闭" className="icon-button" onClick={onClose}>
               <Icon name="close" />
             </button>
           )}
-        </header>
+        </div>
         <div className="modal-body">{children}</div>
       </div>
     </div>

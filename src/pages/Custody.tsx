@@ -5,7 +5,7 @@ import type { GameState } from "../types";
 export function Custody({ s }: { s: GameState }) {
   const act = useGame((x) => x.act);
   return (
-    <Modal title="战后处置 · 非致命拘捕">
+    <Modal title="缉拿判定">
       <div className="custody-heading">
         <Portrait index={5} />
         <div>

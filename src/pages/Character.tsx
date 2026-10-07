@@ -1,3 +1,4 @@
+import { ItemArt } from "../components/Reference";
 import { origins, talents, items } from "../data/world";
 import { Icon, Portrait, Seal, Section, Meter } from "../components/UI";
 import type { GameState, Page, Item } from "../types";
@@ -97,7 +98,7 @@ export function Character({
                 key={slot}
                 onClick={() => (item ? onItem(item) : navigate("inventory"))}
               >
-                <Icon name={item?.icon || "shirt"} size={25} />
+                <ItemArt icon={item?.icon || "shirt"} />
                 <span>
                   <small>{label}</small>
                   <b>

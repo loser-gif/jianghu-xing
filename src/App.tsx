@@ -13,6 +13,12 @@ import { Journal } from "./pages/Journal";
 import { Combat } from "./pages/Combat";
 import { Custody } from "./pages/Custody";
 import { SavePanel } from "./pages/SavePanel";
+import {
+  ReferenceArt,
+  ReferenceHeader,
+  ReferenceNavIcon,
+  InkEdges,
+} from "./components/Reference";
 import { useCallback, useState, useEffect } from "react";
 import { useGame } from "./store";
 import { locations, origins, timeLabel, stageLabels } from "./data/world";
@@ -35,9 +41,9 @@ const pageTitles: Record<Page, [string, string]> = {
   character: ["人物", "见天地，见众生，见自己"],
   npc: ["人物谱", "江湖中的你我故人"],
   arts: ["武学录", "一招一式，皆是修行"],
-  inventory: ["行囊", "一剑一壶酒，随身是江湖"],
+  inventory: ["装备谱", "行走江湖，器甲相随"],
   map: ["天下舆图", "山河远阔，来日方长"],
-  quest: ["江湖事", "来路有迹，去处有因"],
+  quest: ["缉捕令", "官府通缉，依法缉凶"],
   identity: ["身份司簿", "有所担当，方为江湖中人"],
   journal: ["江湖手记", "一笔一划，记下自己的故事"],
 };
@@ -93,67 +99,42 @@ export default function App() {
     <>
       {screen === "menu" ? (
         <div className="menu-page">
-          <div className="menu-art" />
-          <div className="menu-top">
-            <span className="brand-small">
-              江湖行 <Seal>杭州篇</Seal>
-            </span>
-            <button className="text-button" onClick={() => setHelp(true)}>
-              初入江湖须知 <Icon name="help" size={16} />
+          <ReferenceArt
+            figure={1}
+            rect={[15, 35, 275, 620]}
+            className="menu-reference"
+            fit="none"
+          />
+          <h1 className="sr-only">江湖行</h1>
+          <nav className="menu-original-actions" aria-label="主菜单">
+            <button onClick={() => setScreen("create")} aria-label="开始江湖">
+              <span className="sr-only">开始江湖</span>
             </button>
-          </div>
-          <main className="menu-content">
-            <div className="menu-kicker">
-              <span /> 开放式文字武侠 · 杭州卷
-            </div>
-            <h1>
-              江湖<span>行</span>
-              <Seal>一念之间</Seal>
-            </h1>
-            <p className="menu-poem">
-              一纸江湖，万般人生。
-              <br />
-              山水有相逢，来去皆由你。
-            </p>
-            <div className="menu-actions">
-              <Button
-                kind="ink"
-                onClick={() => {
-                  if (s.started) setHelp(false);
-                  setScreen("create");
-                }}
-              >
-                <Icon name="feather" />
-                初入江湖 <Icon name="right" size={16} />
-              </Button>
-              {s.started && (
-                <Button onClick={() => setScreen("game")}>
-                  <Icon name="book" />
-                  续写前缘 <span className="small">{s.player.name}</span>
-                  <Icon name="right" size={16} />
-                </Button>
-              )}
-              <button
-                className="text-button menu-load"
-                onClick={() => setSaveOpen(true)}
-              >
-                <Icon name="save" size={16} />
-                读取存档
-              </button>
-            </div>
-            <div className="menu-note">
-              <span className="vertical-line" />
-              少一些匆忙，多一段属于你的江湖。
-            </div>
-          </main>
-          <div className="menu-footer">
-            <span>大胤十二年 · 杭州</span>
-            <span>第一卷 · 烟雨初逢</span>
-            <span>山水间，自有故事</span>
-          </div>
+            <button
+              disabled={!s.started}
+              onClick={() => setScreen("game")}
+              aria-label="继续游历"
+            >
+              <span className="sr-only">继续游历</span>
+            </button>
+            <button
+              onClick={() => {
+                if (s.started) {
+                  setPage("npc");
+                  setScreen("game");
+                } else setScreen("create");
+              }}
+              aria-label="人物志"
+            >
+              <span className="sr-only">人物志</span>
+            </button>
+            <button onClick={() => setSaveOpen(true)} aria-label="设置与存档">
+              <span className="sr-only">设置与存档</span>
+            </button>
+          </nav>
         </div>
       ) : (
-        <div className="app-shell">
+        <div className={`app-shell ref-page-${page}`}>
           <aside className="sidebar">
             <button
               className="brand"
@@ -259,24 +240,10 @@ export default function App() {
               </div>
             </header>
             <main className="workspace">
-              <div className="page-heading">
-                <div>
-                  <div className="eyebrow">
-                    JIANG HU · {page === "jianghu" ? "HANGZHOU" : "CHRONICLES"}
-                  </div>
-                  <h1>
-                    {pageTitles[page][0]}
-                    <Seal>{page === "jianghu" ? "杭州" : "江湖"}</Seal>
-                  </h1>
-                  <p>{pageTitles[page][1]}</p>
-                </div>
-                <div className="heading-art" />
-                <span className="heading-poem">
-                  人间有味是清欢
-                  <br />
-                  半城烟雨半城诗
-                </span>
-              </div>
+              <ReferenceHeader
+                title={pageTitles[page][0]}
+                subtitle={pageTitles[page][1]}
+              />
               {storageError && (
                 <div className="error-banner" role="alert">
                   {storageError}
@@ -410,6 +377,14 @@ export default function App() {
                   </aside>
                 )}
               </div>
+              <div className="sheet-utilities">
+                <button onClick={() => navigate("character")}>我的人物</button>
+                <button onClick={() => navigate("npc")}>人物谱</button>
+                <button onClick={() => navigate("identity")}>身份司簿</button>
+                <button onClick={() => navigate("quest")}>缉捕令</button>
+                <button onClick={() => setSaveOpen(true)}>存档</button>
+                <button onClick={() => setScreen("menu")}>首页</button>
+              </div>
               <footer className="page-footer">
                 <span>江湖路远，且行且记。</span>
                 <span>
@@ -419,7 +394,8 @@ export default function App() {
               </footer>
             </main>
           </div>
-          <nav className="mobile-nav">
+          <nav className="mobile-nav" aria-label="主要导航">
+            <InkEdges />
             {(
               [
                 { id: "inventory", label: "行囊", icon: "bag" },
@@ -428,7 +404,7 @@ export default function App() {
                 { id: "arts", label: "武学", icon: "book" },
                 { id: "map", label: "地图", icon: "map" },
               ] as const
-            ).map((n) => (
+            ).map((n, index) => (
               <button
                 key={n.id}
                 className={
@@ -437,9 +413,9 @@ export default function App() {
                     ? "active"
                     : ""
                 }
-                onClick={() => navigate(n.id)}
+                onClick={() => navigate(n.id === "character" ? "npc" : n.id)}
               >
-                <Icon name={n.icon} />
+                <ReferenceNavIcon index={index} />
                 <span>{n.label}</span>
               </button>
             ))}

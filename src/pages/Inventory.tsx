@@ -1,3 +1,4 @@
+import { ItemArt } from "../components/Reference";
 import { useState } from "react";
 import { items } from "../data/world";
 import { Icon, Portrait } from "../components/UI";
@@ -62,7 +63,7 @@ export function Inventory({
             onClick={() => onItem(i)}
           >
             <div className="inventory-item-art">
-              <Icon name={i.icon} size={47} />
+              <ItemArt icon={i.icon} />
               <span>{i.quality || i.kind}</span>
             </div>
             <div className="inventory-item-copy">

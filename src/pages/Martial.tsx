@@ -1,3 +1,4 @@
+import { ReferenceArt } from "../components/Reference";
 import { useState } from "react";
 import { useGame } from "../store";
 import { arts, npcs, locations, npcLocation } from "../data/world";
@@ -45,6 +46,10 @@ export function Martial({
             return (
               <article className="art-card" key={a.id}>
                 <div className="book-cover">
+                  <ReferenceArt
+                    figure={1}
+                    rect={[94, 708 + (index % 4) * 88, 57, 79]}
+                  />
                   <span>{a.name}</span>
                   <small>武学秘笈</small>
                   <Icon name={a.icon} size={32} />

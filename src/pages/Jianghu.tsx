@@ -1,3 +1,5 @@
+import { ReferenceArt } from "../components/Reference";
+import { derived } from "../engine/game";
 import { useState, useEffect } from "react";
 import { relationLabel } from "../engine/game";
 import { useGame } from "../store";
@@ -35,11 +37,46 @@ export function Jianghu({
   useEffect(() => setShopOpen(false), [s.location]);
   return (
     <>
+      <div className="journey-status">
+        <Portrait size="small" />
+        <div>
+          <b>{s.player.name}</b>
+          <small>杭州 · {l.name}</small>
+        </div>
+        <div>
+          <span>
+            气血 {s.player.hp}/{derived(s).maxHp}
+          </span>
+          <span>
+            内力 {s.player.qi}/{derived(s).maxQi}
+          </span>
+          <small>
+            银两 {s.player.silver} · 名望 {s.player.fame}
+          </small>
+        </div>
+      </div>
       <div className={`scene scene-${s.location}`}>
-        <div
-          className="scene-art"
-          role="img"
-          aria-label={l.name + "水墨场景"}
+        <ReferenceArt
+          figure={
+            s.location === "lake"
+              ? 1
+              : s.location === "smith"
+                ? 16
+                : s.location === "inn"
+                  ? 11
+                  : 18
+          }
+          rect={
+            s.location === "lake"
+              ? [601, 157, 282, 140]
+              : s.location === "smith"
+                ? [425, 0, 420, 255]
+                : s.location === "inn"
+                  ? [0, 0, 850, 615]
+                  : [410, 0, 440, 250]
+          }
+          className="scene-reference"
+          label={l.name + "文档原画场景"}
         />
         <div className="scene-title">
           <span>江 南 · 杭 州</span>

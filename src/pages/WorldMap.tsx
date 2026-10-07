@@ -1,8 +1,8 @@
+import { ReferenceArt } from "../components/Reference";
 import { useState } from "react";
 import { locations } from "../data/world";
 import { Icon, Seal, Button } from "../components/UI";
 import type { GameState } from "../types";
-const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
 export function WorldMap({
   s,
@@ -23,7 +23,12 @@ export function WorldMap({
         <span className="tag">当前开放区域</span>
       </div>
       <div className="world-map">
-        <img src={asset("west-lake.webp")} alt="杭州山水舆图背景" />
+        <ReferenceArt
+          figure={8}
+          rect={[377, 0, 470, 249]}
+          className="map-reference"
+          label="文档原画山水舆图"
+        />
         <div className="map-water-label">西 湖</div>
         <div className="map-title">
           杭<br />州<br />
