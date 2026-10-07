@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { artUrl } from "../artAssets";
 import type { ReactNode } from "react";
 import {
   ArrowLeft,
@@ -70,7 +71,7 @@ export function Art({
       </defs>
       <image
         clipPath={`url(#${clip})`}
-        href={`${import.meta.env.BASE_URL}reference/figure-${figure}.jpg`}
+        href={artUrl(`reference/figure-${figure}.jpg`)}
         width={figure === 1 ? 1200 : 850}
         height={figure === 1 ? 1097 : 1510}
       />
@@ -577,7 +578,7 @@ export function ItemPicture({ item }: { item: Item }) {
     return (
       <div className="item-art-frame">
         <img
-          src={`${import.meta.env.BASE_URL}art/equipment/${item.id}.png`}
+          src={artUrl(`art/equipment/${item.id}.png`)}
           className="item-picture equipment-illustration"
           alt={item.name}
           width="512"

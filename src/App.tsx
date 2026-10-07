@@ -101,6 +101,7 @@ export default function App() {
         {screen === "menu" ? (
           <MainMenu
             s={s}
+            paused={saveOpen || help}
             onStart={() => setScreen("create")}
             onContinue={() => setScreen("game")}
             onSave={() => setSaveOpen(true)}

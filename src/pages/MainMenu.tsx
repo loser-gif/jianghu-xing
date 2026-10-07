@@ -1,4 +1,6 @@
 import { locations, timeLabel } from "../data/world";
+import { useEffect, useState } from "react";
+import { artUrl } from "../artAssets";
 import type { GameState } from "../types";
 
 export function MainMenu({
@@ -7,24 +9,84 @@ export function MainMenu({
   onContinue,
   onSave,
   onHelp,
+  paused = false,
 }: {
   s: GameState;
   onStart: () => void;
   onContinue: () => void;
   onSave: () => void;
   onHelp: () => void;
+  paused?: boolean;
 }) {
+  const [motion, setMotion] = useState(() => {
+    try {
+      return localStorage.getItem("jianghu-menu-motion") !== "off";
+    } catch {
+      return true;
+    }
+  });
+  const [visible, setVisible] = useState(!document.hidden);
+  const [reduced, setReduced] = useState(
+    () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  useEffect(() => {
+    const media = matchMedia("(prefers-reduced-motion: reduce)");
+    const change = () => setReduced(media.matches);
+    const visibility = () => setVisible(!document.hidden);
+    media.addEventListener("change", change);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      media.removeEventListener("change", change);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
   const location = locations.find((place) => place.id === s.location)?.name;
   return (
-    <section className="opening-menu" aria-label="江湖行主菜单">
+    <section
+      className={`opening-menu ${motion && visible && !reduced && !paused ? "motion-playing" : "motion-paused"}`}
+      aria-label="江湖行主菜单"
+    >
       <img
         className="opening-painting"
-        src={`${import.meta.env.BASE_URL}art/menu/mountain-moon.png`}
+        src={artUrl("art/menu/mountain-moon.png")}
         alt=""
         aria-hidden="true"
         fetchPriority="high"
       />
       <div className="opening-wash" aria-hidden="true" />
+      <div className="opening-atmosphere" aria-hidden="true">
+        <div className="opening-mist mist-distant" />
+        <div className="opening-mist mist-near" />
+        <div className="opening-moonlight" />
+        <div className="opening-motes">
+          {Array.from({ length: 10 }, (_, index) => (
+            <i
+              key={index}
+              style={{
+                left: `${12 + ((index * 23) % 78)}%`,
+                top: `${48 + ((index * 13) % 43)}%`,
+                animationDelay: `${-index * 1.7}s`,
+                animationDuration: `${10 + (index % 4) * 3}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      <button
+        className="opening-motion-control"
+        disabled={reduced}
+        aria-pressed={!motion || reduced}
+        onClick={() => {
+          setMotion(!motion);
+          try {
+            localStorage.setItem("jianghu-menu-motion", motion ? "off" : "on");
+          } catch {
+            /* Optional preference. */
+          }
+        }}
+      >
+        {reduced ? "静态画面" : motion ? "暂停动效" : "开启动效"}
+      </button>
       <header className="opening-heading">
         <h1 aria-label="江湖行">
           <span>江</span>
@@ -49,7 +111,7 @@ export function MainMenu({
               <span className="opening-diamond" aria-hidden="true" />
               <span>
                 继续游历
-                  <small title={`${s.player.name} · ${location}`}>
+                <small title={`${s.player.name} · ${location}`}>
                   {s.player.name} · {location}
                 </small>
               </span>

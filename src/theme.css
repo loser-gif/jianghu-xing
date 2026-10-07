@@ -3837,6 +3837,179 @@ dialog::backdrop {
   pointer-events: none;
   z-index: -1;
 }
+.opening-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.opening-painting {
+  animation: mountain-breath 38s ease-in-out infinite alternate;
+  transform-origin: 50% 40%;
+}
+.opening-mist {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 22%;
+  background: radial-gradient(
+    ellipse at 40% 50%,
+    #eeeee5a0,
+    #e4e9e142 40%,
+    transparent 68%
+  );
+}
+.mist-distant {
+  top: 37%;
+  animation: mist-drift 24s ease-in-out infinite alternate;
+  opacity: 0.28;
+}
+.mist-near {
+  top: 65%;
+  height: 27%;
+  animation: mist-drift 31s ease-in-out -13s infinite alternate-reverse;
+  opacity: 0.2;
+}
+.opening-moonlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 75% 17%, #fff4cc73, transparent 22%);
+  mix-blend-mode: screen;
+  animation: moon-breath 12s ease-in-out infinite alternate;
+}
+.opening-motes {
+  position: absolute;
+  inset: 0;
+}
+.opening-motes i {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #f1d497;
+  box-shadow: 0 0 7px 2px #ecd4a240;
+  animation: mote-drift 14s linear infinite;
+  opacity: 0;
+}
+.motion-paused .opening-painting,
+.motion-paused .opening-atmosphere * {
+  animation-play-state: paused;
+}
+.opening-motion-control {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 4;
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #293a3c;
+  border: 1px solid #40545350;
+  background: #ecebd9d6;
+}
+.opening-motion-control:hover {
+  background: #f8f2df;
+}
+.opening-motion-control:disabled {
+  color: #344347;
+}
+@keyframes mountain-breath {
+  from {
+    transform: scale(1.035) translate(-0.35%, 0);
+  }
+  to {
+    transform: scale(1.055) translate(0.35%, -0.5%);
+  }
+}
+@keyframes mist-drift {
+  from {
+    transform: translateX(-8%) translateY(2%);
+  }
+  to {
+    transform: translateX(8%) translateY(-4%);
+  }
+}
+@keyframes moon-breath {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+@keyframes mote-drift {
+  0% {
+    transform: translate(0, 18px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(22px, -46px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opening-painting,
+  .opening-atmosphere * {
+    animation: none !important;
+  }
+  .opening-motes {
+    display: none;
+  }
+}
+.artwork-gate {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 35%, #f6f3e6, #e2e1d5);
+}
+.artwork-gate h1 {
+  font:
+    56px/1.5 "STKaiti",
+    "KaiTi",
+    serif;
+  color: var(--ink);
+  letter-spacing: 10px;
+  margin: 12px 0 22px;
+}
+.artwork-gate progress {
+  appearance: none;
+  width: min(260px, 80vw);
+  height: 5px;
+  margin: 22px 0 12px;
+  border: 0;
+  background: #c9c8b9;
+}
+.artwork-gate progress::-webkit-progress-bar {
+  background: #c9c8b9;
+}
+.artwork-gate progress::-webkit-progress-value {
+  background: #7e805f;
+}
+.artwork-gate progress::-moz-progress-bar {
+  background: #7e805f;
+}
+.artwork-percent {
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 18px;
+}
+.artwork-recovery {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
 .opening-painting {
   display: block;
   object-fit: cover;

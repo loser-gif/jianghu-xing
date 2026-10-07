@@ -1,0 +1,46 @@
+{
+  "art/menu/mountain-moon.png": {
+    "file": "art/optimized/mountain-moon.6ac2f9d56e45.webp",
+    "bytes": 512566
+  },
+  "reference/figure-8.jpg": {
+    "file": "art/optimized/figure-8.9983f133950a.webp",
+    "bytes": 252318
+  },
+  "reference/figure-9.jpg": {
+    "file": "art/optimized/figure-9.87d88ab36a0a.webp",
+    "bytes": 264926
+  },
+  "reference/figure-10.jpg": {
+    "file": "art/optimized/figure-10.ea7290fc14e3.webp",
+    "bytes": 293432
+  },
+  "reference/figure-15.jpg": {
+    "file": "art/optimized/figure-15.423de4c895db.webp",
+    "bytes": 289244
+  },
+  "reference/figure-18.jpg": {
+    "file": "art/optimized/figure-18.8c0818336c45.webp",
+    "bytes": 340420
+  },
+  "art/equipment/sword.png": {
+    "file": "art/optimized/sword.a802319cebc6.webp",
+    "bytes": 140384
+  },
+  "art/equipment/saber.png": {
+    "file": "art/optimized/saber.8718004f2eb4.webp",
+    "bytes": 137466
+  },
+  "art/equipment/robe.png": {
+    "file": "art/optimized/robe.dfb16d2b08b3.webp",
+    "bytes": 239786
+  },
+  "art/equipment/boots.png": {
+    "file": "art/optimized/boots.a08a041d9450.webp",
+    "bytes": 249240
+  },
+  "art/equipment/oldSword.png": {
+    "file": "art/optimized/oldSword.f71603cb1191.webp",
+    "bytes": 106804
+  }
+}
