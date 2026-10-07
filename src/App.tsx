@@ -110,7 +110,7 @@ export default function App() {
         ) : screen === "create" ? (
           <>
             <Header title="初入江湖" subtitle="定下名姓，自立身世" />
-            <div className="page-content">
+            <div className="page-content page-arrival" key="creation">
               <Creation
                 onBack={() => setScreen("menu")}
                 onDone={() => {
@@ -146,7 +146,10 @@ export default function App() {
               }
               equipment={page === "inventory"}
             />
-            <div className="page-content">
+            <div
+              className="page-content page-arrival"
+              key={`${page}-${npc?.id ?? "list"}-${relations}`}
+            >
               {storageError && (
                 <div className="error-banner" role="alert">
                   {storageError}
@@ -264,7 +267,7 @@ export default function App() {
         )}
       </main>
       {notice && screen === "game" && !modalActive && (
-        <div className="toast" role="status">
+        <div className="toast" role="status" key={notice}>
           <Icon name="check" />
           <span>{notice}</span>
           <button aria-label="关闭提示" onClick={() => setNotice("")}>

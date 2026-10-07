@@ -3,12 +3,60 @@ import { arts } from "../data/world";
 import { Icon, Portrait, Button, Meter, Modal } from "../components/UI";
 import type { GameState } from "../types";
 import { derived } from "../engine/game";
+import { useEffect, useRef, useState } from "react";
+
+function CombatPortrait({
+  index = 6,
+  delta = 0,
+  round,
+}: {
+  index?: number;
+  delta?: number;
+  round: number;
+}) {
+  return (
+    <div className="combat-portrait">
+      <Portrait index={index} />
+      {delta !== 0 && (
+        <div
+          key={round}
+          className={`combat-impact ${delta > 0 ? "restoring" : "struck"}`}
+          aria-hidden="true"
+        >
+          <i className="impact-mark" />
+          <span className="impact-number">
+            {delta > 0 ? "+" : "−"}
+            {Math.abs(delta)}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Combat({ s }: { s: GameState }) {
   const act = useGame((x) => x.act);
   const c = s.combat!,
     d = derived(s),
     art = arts.find((a) => a.id === s.activeArt)!;
+  const previous = useRef({ round: c.round, player: s.player.hp, enemy: c.hp });
+  const [pulse, setPulse] = useState<{
+    round: number;
+    player: number;
+    enemy: number;
+  } | null>(null);
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = { round: c.round, player: s.player.hp, enemy: c.hp };
+    if (before.round === c.round) return;
+    setPulse({
+      round: c.round,
+      player: s.player.hp - before.player,
+      enemy: c.hp - before.enemy,
+    });
+    const timer = window.setTimeout(() => setPulse(null), 1200);
+    return () => window.clearTimeout(timer);
+  }, [c.round, c.hp, s.player.hp]);
   return (
     <Modal title="旧码头 · 交锋" wide>
       <div className="combat-round">
@@ -16,7 +64,10 @@ export function Combat({ s }: { s: GameState }) {
       </div>
       <div className="combatants">
         <div>
-          <Portrait />
+          <CombatPortrait
+            delta={pulse?.player}
+            round={pulse?.round ?? c.round}
+          />
           <h3>{s.player.name}</h3>
           <Meter label="气血" value={s.player.hp} max={d.maxHp} color="red" />
           <Meter label="内力" value={s.player.qi} max={d.maxQi} />
@@ -25,7 +76,11 @@ export function Combat({ s }: { s: GameState }) {
           交<br />锋
         </span>
         <div>
-          <Portrait index={5} />
+          <CombatPortrait
+            index={5}
+            delta={pulse?.enemy}
+            round={pulse?.round ?? c.round}
+          />
           <h3>顾红绫</h3>
           <Meter label="气血" value={c.hp} max={c.maxHp} color="red" />
           <p className="small muted">身轻如燕 · 每三回合使出燕返</p>
@@ -33,7 +88,7 @@ export function Combat({ s }: { s: GameState }) {
       </div>
       <div className="combat-log" aria-live="polite">
         {c.logs.slice(0, 5).map((l, i) => (
-          <p key={i} className={i === 0 ? "latest" : ""}>
+          <p key={`${c.round}-${i}`} className={i === 0 ? "latest" : ""}>
             {l}
           </p>
         ))}

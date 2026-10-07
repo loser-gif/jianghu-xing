@@ -3,6 +3,14 @@
     "file": "art/optimized/mountain-moon.6ac2f9d56e45.webp",
     "bytes": 512566
   },
+  "art/menu/mountain-background.png": {
+    "file": "art/optimized/mountain-background.e6a98a0d862f.webp",
+    "bytes": 415842
+  },
+  "art/menu/swordsman-wind.png": {
+    "file": "art/optimized/swordsman-wind.0099d2599dc8.webp",
+    "bytes": 145538
+  },
   "reference/figure-8.jpg": {
     "file": "art/optimized/figure-8.9983f133950a.webp",
     "bytes": 252318

@@ -1,6 +1,7 @@
 import { locations, timeLabel } from "../data/world";
 import { useEffect, useState } from "react";
 import { artUrl } from "../artAssets";
+import { LiveLandscape } from "../components/LiveLandscape";
 import type { GameState } from "../types";
 
 export function MainMenu({
@@ -26,6 +27,7 @@ export function MainMenu({
     }
   });
   const [visible, setVisible] = useState(!document.hidden);
+  const [unavailable, setUnavailable] = useState(false);
   const [reduced, setReduced] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
@@ -43,7 +45,7 @@ export function MainMenu({
   const location = locations.find((place) => place.id === s.location)?.name;
   return (
     <section
-      className={`opening-menu ${motion && visible && !reduced && !paused ? "motion-playing" : "motion-paused"}`}
+      className={`opening-menu ${motion && visible && !reduced && !paused && !unavailable ? "motion-playing" : "motion-paused"}`}
       aria-label="江湖行主菜单"
     >
       <img
@@ -53,10 +55,12 @@ export function MainMenu({
         aria-hidden="true"
         fetchPriority="high"
       />
+      <LiveLandscape
+        playing={motion && visible && !reduced && !paused && !unavailable}
+        onUnavailable={setUnavailable}
+      />
       <div className="opening-wash" aria-hidden="true" />
       <div className="opening-atmosphere" aria-hidden="true">
-        <div className="opening-mist mist-distant" />
-        <div className="opening-mist mist-near" />
         <div className="opening-moonlight" />
         <div className="opening-motes">
           {Array.from({ length: 10 }, (_, index) => (
@@ -74,8 +78,8 @@ export function MainMenu({
       </div>
       <button
         className="opening-motion-control"
-        disabled={reduced}
-        aria-pressed={!motion || reduced}
+        disabled={reduced || unavailable}
+        aria-pressed={!motion || reduced || unavailable}
         onClick={() => {
           setMotion(!motion);
           try {
@@ -85,7 +89,7 @@ export function MainMenu({
           }
         }}
       >
-        {reduced ? "静态画面" : motion ? "暂停动效" : "开启动效"}
+        {reduced || unavailable ? "静态画面" : motion ? "暂停动效" : "开启动效"}
       </button>
       <header className="opening-heading">
         <h1 aria-label="江湖行">

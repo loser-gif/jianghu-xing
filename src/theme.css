@@ -3829,6 +3829,7 @@ dialog::backdrop {
   z-index: 3;
 }
 .opening-painting,
+.opening-live-painting,
 .opening-wash {
   position: absolute;
   inset: 0;
@@ -3844,39 +3845,19 @@ dialog::backdrop {
   pointer-events: none;
   overflow: hidden;
 }
-.opening-painting {
-  animation: mountain-breath 38s ease-in-out infinite alternate;
-  transform-origin: 50% 40%;
+.opening-live-painting {
+  display: block;
+  opacity: 0;
 }
-.opening-mist {
-  position: absolute;
-  left: -30%;
-  width: 160%;
-  height: 22%;
-  background: radial-gradient(
-    ellipse at 40% 50%,
-    #eeeee5a0,
-    #e4e9e142 40%,
-    transparent 68%
-  );
-}
-.mist-distant {
-  top: 37%;
-  animation: mist-drift 24s ease-in-out infinite alternate;
-  opacity: 0.28;
-}
-.mist-near {
-  top: 65%;
-  height: 27%;
-  animation: mist-drift 31s ease-in-out -13s infinite alternate-reverse;
-  opacity: 0.2;
+.opening-live-painting.is-ready {
+  opacity: 1;
 }
 .opening-moonlight {
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at 75% 17%, #fff4cc73, transparent 22%);
   mix-blend-mode: screen;
-  animation: moon-breath 12s ease-in-out infinite alternate;
+  opacity: 0.42;
 }
 .opening-motes {
   position: absolute;
@@ -3913,30 +3894,6 @@ dialog::backdrop {
 }
 .opening-motion-control:disabled {
   color: #344347;
-}
-@keyframes mountain-breath {
-  from {
-    transform: scale(1.035) translate(-0.35%, 0);
-  }
-  to {
-    transform: scale(1.055) translate(0.35%, -0.5%);
-  }
-}
-@keyframes mist-drift {
-  from {
-    transform: translateX(-8%) translateY(2%);
-  }
-  to {
-    transform: translateX(8%) translateY(-4%);
-  }
-}
-@keyframes moon-breath {
-  from {
-    opacity: 0.3;
-  }
-  to {
-    opacity: 0.7;
-  }
 }
 @keyframes mote-drift {
   0% {
@@ -4653,5 +4610,271 @@ dialog::backdrop {
   }
   .art-buttons .button:last-child {
     grid-column: 1 / -1;
+  }
+}
+
+/* Movement follows the paper, ink and brass already used by the reference UI. */
+.game-dialog {
+  background-image: linear-gradient(125deg, #fffdf338, transparent 58%);
+  box-shadow:
+    0 18px 60px #202c2942,
+    inset 0 0 0 4px #f9f5e755;
+}
+.tabs button:focus-visible,
+.button:focus-visible,
+.ink-button:focus-visible,
+.equip-button:focus-visible {
+  outline: 3px solid #936c37;
+  outline-offset: 3px;
+}
+.combat-portrait {
+  position: relative;
+  width: 110px;
+  margin: 0 auto;
+}
+.combat-impact {
+  position: absolute;
+  inset: 0 0 12px;
+  pointer-events: none;
+}
+.impact-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font:
+    700 27px/1.2 "SimSun",
+    "Songti SC",
+    serif;
+  color: #752f29;
+  background: #f0e8d8e8;
+  padding: 3px 9px;
+  border: 1px solid #a1776070;
+  text-shadow: 0 1px #fff6;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.restoring .impact-number {
+  color: #465e41;
+  border-color: #7b895c80;
+}
+.impact-mark {
+  display: none;
+}
+@media (max-width: 600px) {
+  .combat-portrait {
+    width: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-arrival {
+    animation: paper-arrive 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  dialog[open] {
+    animation: paper-arrive 200ms ease-out both;
+  }
+  dialog[open]::backdrop {
+    animation: ink-backdrop 200ms ease-out both;
+  }
+  .toast {
+    animation: message-arrive 220ms ease-out both;
+  }
+  .meter-track > span {
+    transition: width 440ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  }
+  .bottom-nav button .ink-nav-icon {
+    transition:
+      transform 200ms ease,
+      color 200ms ease;
+  }
+  .bottom-nav button[aria-current] .ink-nav-icon {
+    animation: seal-settle 240ms ease-out;
+  }
+  .tabs button[aria-pressed="true"]:after,
+  .equip-button.equipped:after {
+    animation: ink-backdrop 220ms ease-out;
+  }
+  .opening-heading h1 > span {
+    animation: title-ink 700ms ease-out both;
+  }
+  .opening-heading h1 > span:nth-child(2) {
+    animation-delay: 90ms;
+  }
+  .opening-heading h1 > span:nth-child(3) {
+    animation-delay: 180ms;
+  }
+  .opening-verse,
+  .opening-footer {
+    animation: ink-backdrop 850ms ease-out both;
+  }
+  .opening-actions > button {
+    animation: menu-arrive 420ms ease-out both;
+  }
+  .opening-actions > button:nth-of-type(2) {
+    animation-delay: 70ms;
+  }
+  .opening-actions > button:nth-of-type(3) {
+    animation-delay: 140ms;
+  }
+  .opening-actions > button:nth-of-type(4) {
+    animation-delay: 210ms;
+  }
+  .opening-diamond {
+    transition: box-shadow 180ms ease;
+  }
+  .opening-action:enabled:hover .opening-diamond {
+    box-shadow: 0 0 0 4px #ddc59122;
+  }
+  .opening-action:active:not(:disabled),
+  .button:active:not(:disabled),
+  .outline-button:active:not(:disabled),
+  .equip-button:active:not(:disabled) {
+    translate: 0 1px;
+  }
+  .person-row,
+  .equipment-row,
+  .action-row,
+  .art-card {
+    transition:
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  .combat-log .latest {
+    animation: paper-arrive 220ms ease-out;
+  }
+  .combat-impact .impact-number {
+    animation: ink-number 1100ms ease-out both;
+  }
+  .impact-mark {
+    display: block;
+    position: absolute;
+    left: 3%;
+    top: 43%;
+    width: 94%;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #27372fc4 20%,
+      #ddd0a4 51%,
+      #26372aa0 83%,
+      transparent
+    );
+    transform: rotate(-33deg);
+    animation: ink-strike 400ms ease-out both;
+    transform-origin: 10% 50%;
+  }
+  .restoring .impact-mark {
+    inset: 14%;
+    width: auto;
+    height: auto;
+    border: 1px solid #71836199;
+    border-radius: 50%;
+    background: none;
+    transform-origin: center;
+    animation: breath-ring 650ms ease-out both;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .person-row:hover,
+    .equipment-row:hover,
+    .action-row:hover,
+    .art-card:hover {
+      box-shadow: inset 0 0 30px #8c906d10;
+    }
+  }
+}
+@keyframes paper-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes menu-arrive {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes title-ink {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes ink-backdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes seal-settle {
+  from {
+    transform: translateY(-3px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes message-arrive {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 7px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes ink-number {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -25%);
+  }
+  18%,
+  68% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -115%);
+  }
+}
+@keyframes ink-strike {
+  0% {
+    opacity: 0;
+    transform: rotate(-33deg) scaleX(0.1);
+  }
+  24% {
+    opacity: 0.9;
+    transform: rotate(-33deg) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-33deg) scaleX(1.08);
+  }
+}
+@keyframes breath-ring {
+  from {
+    opacity: 0.6;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.12);
   }
 }
