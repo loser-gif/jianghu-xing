@@ -669,9 +669,11 @@ export function Equipment({
         onChange={setFilter}
         label="装备分类"
       />
-      <section className="equipment-summary">
-        <Portrait id="player" />
-        <div>
+      <section
+        className="equipment-summary illustrated-loadout"
+        aria-label="随身器甲"
+      >
+        <div className="loadout-heading">
           <h2>
             {s.player.name}
             <span className="seal small-seal">
@@ -682,34 +684,63 @@ export function Equipment({
                   : "侠客"}
             </span>
           </h2>
-          <p>仗剑天涯 · 一器相伴</p>
+          <p>器甲在身，行走更稳</p>
+        </div>
+        <div className="loadout-scene">
+          <Art
+            figure={15}
+            rect={[266, 279, 250, 603]}
+            className="loadout-figure"
+            label="随身器甲人物立绘"
+            fit="xMidYMid meet"
+          />
           <div className="loadout">
             {[
               ["weapon", "兵器"],
               ["armor", "衣甲"],
               ["feet", "足部"],
-            ].map(([slot, label]) => (
-              <button
-                key={slot}
-                onClick={() => {
-                  const equipped = items.find((i) => i.id === s.equipped[slot]);
-                  if (equipped) setSelected(equipped);
-                  else {
-                    setFilter(slot === "weapon" ? "兵器" : "护甲");
-                    setQuery("");
-                  }
-                }}
-              >
-                <span>{label}</span>
-                <strong>
-                  {items.find((i) => i.id === s.equipped[slot])?.name ||
-                    "未装备 · 选装"}
-                  {s.equipped[slot] && s.upgrades[s.equipped[slot]]
-                    ? ` +${s.upgrades[s.equipped[slot]]}`
-                    : ""}
-                </strong>
-              </button>
-            ))}
+            ].map(([slot, label]) => {
+              const equipped = items.find((i) => i.id === s.equipped[slot]);
+              const EmptyIcon =
+                slot === "weapon"
+                  ? Sword
+                  : slot === "armor"
+                    ? Shirt
+                    : Footprints;
+              return (
+                <button
+                  key={slot}
+                  onClick={() => {
+                    if (equipped) setSelected(equipped);
+                    else {
+                      setFilter(slot === "weapon" ? "兵器" : "护甲");
+                      setQuery("");
+                    }
+                  }}
+                >
+                  {equipped ? (
+                    <ItemPicture item={equipped} />
+                  ) : (
+                    <div className="item-symbol">
+                      <EmptyIcon aria-hidden="true" />
+                    </div>
+                  )}
+                  <div className="loadout-slot-copy">
+                    <span>{label}</span>
+                    <strong>
+                      {equipped?.name || "未装备 · 选装"}
+                      {s.equipped[slot] && s.upgrades[s.equipped[slot]]
+                        ? ` +${s.upgrades[s.equipped[slot]]}`
+                        : ""}
+                    </strong>
+                    <small>
+                      {equipped ? `${equipped.quality} · 查看` : "点击选装"}
+                    </small>
+                  </div>
+                  <ChevronRight className="loadout-arrow" aria-hidden="true" />
+                </button>
+              );
+            })}
           </div>
         </div>
         <div className="summary-stats">
