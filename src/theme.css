@@ -3099,3 +3099,78 @@ dialog::backdrop {
     height: 22px;
   }
 }
+
+/* Inventory and shop share the approved illustration sizing and paper palette. */
+.shop-list > div {
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+}
+.shop-list .item-art-frame,
+.shop-list .item-symbol {
+  width: 88px;
+  height: 100px;
+}
+.shop-list .item-symbol svg {
+  width: 32px;
+  height: 32px;
+}
+.shop-list .item-stats {
+  margin-top: 8px;
+}
+.shop-discount {
+  color: var(--green);
+}
+.equipment-comparison {
+  border: 1px solid var(--line);
+  padding: 16px;
+  margin: 18px 0;
+}
+.equipment-comparison h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.equipment-comparison dl {
+  margin: 14px 0;
+}
+.equipment-comparison dl > div {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.equipment-comparison dd {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.equipment-comparison p {
+  margin: 8px 0;
+}
+.stat-gain {
+  color: #4f664b;
+}
+.stat-loss {
+  color: #934b40;
+}
+.set-note {
+  color: #4f664b;
+  font-size: 14px;
+}
+@container (max-width:600px) {
+  .shop-list > div {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  .shop-list .item-art-frame,
+  .shop-list .item-symbol {
+    width: 76px;
+    height: 90px;
+  }
+  .shop-list .button {
+    grid-column: 1 / -1;
+    width: 100%;
+    white-space: normal;
+  }
+}

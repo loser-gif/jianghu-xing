@@ -35,6 +35,7 @@ import {
 import { items, locations, npcs } from "../data/world";
 import { derived, relationLabel } from "../engine/game";
 import type { Action } from "../engine/game";
+import { equipmentPreview } from "../engine/equipment";
 import { currentNpcLocation, npcService } from "../engine/people";
 import type { GameState, Item, NPC, Page } from "../types";
 
@@ -583,7 +584,7 @@ export function ItemPicture({ item }: { item: Item }) {
     </div>
   );
 }
-function ItemStats({ item, level }: { item: Item; level: number }) {
+export function ItemStats({ item, level }: { item: Item; level: number }) {
   return (
     <div className="tags item-stats">
       {item.attack && <span>外功 +{item.attack + level * 3}</span>}
@@ -609,8 +610,10 @@ export function Equipment({
         (filter === "全部" ||
           (filter === "兵器" && i.slot === "weapon") ||
           (filter === "护甲" && ["armor", "feet"].includes(i.slot || "")) ||
-          (filter === "其他" && i.kind !== "装备")) &&
-        (i.name + i.description).includes(query.trim()),
+          (["消耗", "材料", "任务"].includes(filter) && i.kind === filter)) &&
+        (i.name + i.kind + (i.quality || "") + i.description).includes(
+          query.trim(),
+        ),
     )
     .sort(
       (a, b) =>
@@ -637,7 +640,7 @@ export function Equipment({
         </label>
       </div>
       <Tabs
-        options={["全部", "兵器", "护甲", "其他"]}
+        options={["全部", "兵器", "护甲", "消耗", "材料", "任务"]}
         value={filter}
         onChange={setFilter}
         label="装备分类"
@@ -647,7 +650,13 @@ export function Equipment({
         <div>
           <h2>
             {s.player.name}
-            <span className="seal small-seal">侠客</span>
+            <span className="seal small-seal">
+              {s.identity.rank >= 2
+                ? "资深捕快"
+                : s.identity.rank
+                  ? "捕快"
+                  : "侠客"}
+            </span>
           </h2>
           <p>仗剑天涯 · 一器相伴</p>
           <div className="loadout">
@@ -658,17 +667,22 @@ export function Equipment({
             ].map(([slot, label]) => (
               <button
                 key={slot}
-                onClick={() =>
-                  setSelected(
-                    items.find((i) => i.id === s.equipped[slot]) || null,
-                  )
-                }
-                disabled={!s.equipped[slot]}
+                onClick={() => {
+                  const equipped = items.find((i) => i.id === s.equipped[slot]);
+                  if (equipped) setSelected(equipped);
+                  else {
+                    setFilter(slot === "weapon" ? "兵器" : "护甲");
+                    setQuery("");
+                  }
+                }}
               >
                 <span>{label}</span>
                 <strong>
                   {items.find((i) => i.id === s.equipped[slot])?.name ||
-                    "未装备"}
+                    "未装备 · 选装"}
+                  {s.equipped[slot] && s.upgrades[s.equipped[slot]]
+                    ? ` +${s.upgrades[s.equipped[slot]]}`
+                    : ""}
                 </strong>
               </button>
             ))}
@@ -689,6 +703,9 @@ export function Equipment({
           </span>
         </div>
       </section>
+      {stats.set && (
+        <p className="selection-note">行云两件套已生效 · 气血上限 +30</p>
+      )}
       <div className="equipment-list">
         {own.map((i) => (
           <article className="equipment-row" key={i.id}>
@@ -704,7 +721,9 @@ export function Equipment({
                   {s.upgrades[i.id] ? ` +${s.upgrades[i.id]}` : ""}
                 </h2>
                 <p className="secondary">
-                  {i.kind} · {i.quality || `持有 ${s.inventory[i.id]} 件`}
+                  {i.kind}
+                  {i.quality ? ` · ${i.quality}` : ""} · 持有{" "}
+                  {s.inventory[i.id]} 件
                 </p>
                 <ItemStats item={i} level={s.upgrades[i.id] || 0} />
               </div>
@@ -785,7 +804,13 @@ export function ItemDialog({
   act: (a: Action) => void;
   close: () => void;
 }) {
-  const initialMessage = useRef(s.lastMessage);
+  const [interacted, setInteracted] = useState(false);
+  const perform = (action: Action) => {
+    setInteracted(true);
+    act(action);
+  };
+  const preview = equipmentPreview(s, item);
+  const owned = s.inventory[item.id] || 0;
   const ref = useRef<HTMLDialogElement>(null),
     level = s.upgrades[item.id] || 0,
     cost = 20 + level * 15;
@@ -827,16 +852,61 @@ export function ItemDialog({
               {item.name}
               {level ? ` +${level}` : ""}
             </h2>
-            <span className="secondary">持有 {s.inventory[item.id]} 件</span>
+            <span className="secondary">持有 {owned} 件</span>
           </div>
         </div>
         <p>{item.description}</p>
         <ItemStats item={item} level={level} />
+        {preview && s.equipped[item.slot!] !== item.id && (
+          <section className="equipment-comparison" aria-label="换装属性对比">
+            <h3>换装对比</h3>
+            <p className="secondary">
+              当前：{preview.current?.name || "尚未装备"}
+              {preview.current && s.upgrades[preview.current.id]
+                ? ` +${s.upgrades[preview.current.id]}`
+                : ""}
+            </p>
+            <dl>
+              {preview.changes.map(({ label, before, after }) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>
+                    <span>
+                      {before} → {after}
+                    </span>
+                    <strong
+                      className={
+                        after > before
+                          ? "stat-gain"
+                          : after < before
+                            ? "stat-loss"
+                            : "secondary"
+                      }
+                    >
+                      {after === before
+                        ? "不变"
+                        : `${after > before ? "+" : ""}${after - before}`}
+                    </strong>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            {preview.after.set && !preview.before.set && (
+              <p className="set-note">将激活行云两件套 · 气血上限额外 +30</p>
+            )}
+            {preview.before.set && !preview.after.set && (
+              <p className="set-note">更换后行云两件套失效</p>
+            )}
+            <p className="secondary">
+              已计入强化与套装效果。提升气血上限不会恢复当前气血。
+            </p>
+          </section>
+        )}
         {item.slot && (
           <button
             className="ink-button full"
-            disabled={s.equipped[item.slot] === item.id}
-            onClick={() => act({ type: "equip", id: item.id })}
+            disabled={!owned || s.equipped[item.slot] === item.id}
+            onClick={() => perform({ type: "equip", id: item.id })}
           >
             {s.equipped[item.slot] === item.id ? "已装备" : "装备此物"}
           </button>
@@ -844,7 +914,9 @@ export function ItemDialog({
         {item.attack && (
           <Panel title="百炼成锋" icon={<Sword />}>
             <p>
-              强化 +{level} → +{Math.min(5, level + 1)} · 外功 +3
+              {level >= 5
+                ? "已达本篇强化上限 +5"
+                : `强化 +${level} → +${level + 1} · 外功 +3`}
             </p>
             <p className="secondary">
               需要精铁 2 块（持有 {s.inventory.iron || 0}）<br />
@@ -853,12 +925,13 @@ export function ItemDialog({
             <button
               className="outline-button full"
               disabled={
+                !owned ||
                 level >= 5 ||
                 (s.location === "smith" &&
                   ((s.inventory.iron || 0) < 2 || s.player.silver < cost))
               }
               onClick={() =>
-                act(
+                perform(
                   s.location === "smith"
                     ? { type: "upgrade", id: item.id }
                     : { type: "move", id: "smith" },
@@ -877,11 +950,13 @@ export function ItemDialog({
           <button
             className="ink-button full"
             disabled={!s.inventory.medicine || s.player.hp >= derived(s).maxHp}
-            onClick={() => act({ type: "use", id: item.id })}
+            onClick={() => perform({ type: "use", id: item.id })}
           >
-            {s.player.hp >= derived(s).maxHp
-              ? "气血充盈，无需用药"
-              : "服用 · 恢复 65 气血"}
+            {!owned
+              ? "金疮药已用尽"
+              : s.player.hp >= derived(s).maxHp
+                ? "气血充盈，无需用药"
+                : "服用 · 恢复 65 气血"}
           </button>
         )}
         {item.id !== "medicine" && item.kind !== "装备" && (
@@ -897,7 +972,7 @@ export function ItemDialog({
                     : "可在对应人物的详情中赠送，或在事件中使用。"}
           </p>
         )}
-        {s.lastMessage && s.lastMessage !== initialMessage.current && (
+        {interacted && s.lastMessage && (
           <p role="status" className="feedback">
             {s.lastMessage}
           </p>

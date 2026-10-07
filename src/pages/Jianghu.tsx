@@ -1,3 +1,4 @@
+import { ItemPicture, ItemStats } from "../components/InkUI";
 import { ReferenceArt } from "../components/Reference";
 import { derived } from "../engine/game";
 import { useState, useEffect } from "react";
@@ -185,20 +186,34 @@ export function Jianghu({
               );
               return (
                 <div key={id}>
-                  <span className="item-symbol">
-                    <Icon name={i.icon} size={22} />
-                  </span>
+                  <ItemPicture item={i} />
                   <span>
                     <b>{i.name}</b>
                     <small>
-                      已有 {s.inventory[id] || 0} · {i.description}
+                      {i.kind}
+                      {i.quality ? ` · ${i.quality}` : ""} · 持有{" "}
+                      {s.inventory[id] || 0} 件
                     </small>
+                    <ItemStats item={i} level={s.upgrades[id] || 0} />
+                    <small>{i.description}</small>
+                    {price < i.price && (
+                      <small className="shop-discount">
+                        熟客价 {price} 两 · 原价 <s>{i.price} 两</s>
+                      </small>
+                    )}
+                    {!shopClosed && s.player.silver < price && (
+                      <small>还差 {price - s.player.silver} 两</small>
+                    )}
                   </span>
                   <Button
                     onClick={() => act({ type: "buy", id })}
                     disabled={shopClosed || s.player.silver < price}
                   >
-                    {price} 两 · 买入
+                    {shopClosed
+                      ? "已打烊"
+                      : s.player.silver < price
+                        ? `${price} 两 · 银两不足`
+                        : `${price} 两 · 买入`}
                   </Button>
                 </div>
               );
