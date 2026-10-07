@@ -1,25 +1,19 @@
 # 江湖行美术记录
 
-## 当前版本：按文档原图复刻
+## 确认依据
 
-依据 `Jianghu_RPG_Codex_Spec_Visual_Reference.docx` 及用户修正要求。排除 Figure 3–7；Figure 2 与 Figure 1 重复，使用 Figure 1 和 Figure 8–20。
+以规划文档及用户确认的人物谱、人物详情、装备谱验收页为准。排除 Figure 3–7 的暗色客栈风格。保留宣纸、山水、毛笔标题、细线框、墨绿与旧金的选中态，不使用整页截图作为游戏界面。
 
-全端保持最大 480px 的竖屏纸页。取消桌面侧栏展开布局，按原稿还原紧凑列表、左右双栏人物资料、山水书法页头、墨色纸边、底部五入口及暗墨描金选中态。正文为系统楷体／宋体，动态标题使用本地毛笔字体。
+## 正式界面
 
-## 素材与映射
+`src/theme.css` 为唯一加载的样式。正文 16px，辅助信息通常 14px，按钮至少 44px。桌面纸页最大 772px，窄屏自动变为单栏，底栏预留安全区域。标题、搜索、分类、列表、关系线、地图节点、书册和按钮均为真实元素。
 
-`public/reference/figure-N.jpg` 为文档内嵌原图。`src/components/Reference.tsx` 以 SVG viewBox 显示对应原画区域，不改画风，不生成替代人物。页内数据、列表、按钮、关系数值和交互仍由游戏状态驱动。
+`src/components/InkUI.tsx` 为正式版和 review.html 的共用实现。`Art` 使用 SVG viewBox 和 clipPath，只显示插画内部。人物来自 Figure 8、9、10、15、18；山水页头来自 Figure 8。原画中的按钮、乱码文字和签名不作为 UI 资源。旧样式文件保留作历史参考，不再加载。
 
-- Figure 1：开篇、玩家肖像、武学书册、西湖场景。
-- Figure 8–10：人物谱页头、人物肖像、人物详情、羁绊图、页边和底部图标。
-- Figure 11：客栈场景。
-- Figure 12–16：委托、装备、装备详情、装备配置、锻造页头及物品原画。
-- Figure 17–20：身份司簿、缉捕、追踪和战后判定原画。
+## 装备
 
-动态页面保留可玩版本的角色与剧情数据；画面长度随内容变化，不将整页截图代替交互页面。原始综合参考尺寸有限，放大后的细节清晰度受原图限制。
-
-`src/reference.css` 是当前复刻样式，后于基础样式加载。旧 `public/assets/` 生成素材保留历史记录，当前页面不再使用。
+青锋剑、柳叶短刀、行云布衣、行云靴、旧铁剑为用户确认的透明背景水墨插画，统一容器、比例和留白。原始依据为文档 Figure 13、15，生成修复记录保存在 `public/art/equipment/provenance.json`。旧铁剑为同风格的朴素旧剑变体。其他材料与功能使用统一线性图标；空装备槽显示占位轮廓。
 
 ## 字体
 
-`public/fonts/DocumentBrush.woff2` 是 Ma Shan Zheng 的界面字集子集，来源为 Google Fonts 官方仓库 `ofl/mashanzheng`。许可证见同目录 `OFL.txt`。字体本地加载，无外部 CDN。增加界面用字时应更新子集，否则使用楷体回退。
+`public/fonts/DocumentBrush.woff2` 是 Ma Shan Zheng 的界面字集子集，来源为 Google Fonts 官方仓库 `ofl/mashanzheng`，许可证见 `OFL.txt`。文字本地渲染，缺失字形回退到楷体或宋体。原图细节清晰度仍受源图分辨率限制。

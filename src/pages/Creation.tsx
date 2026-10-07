@@ -36,11 +36,11 @@ export function Creation({
             </p>
           </div>
         </aside>
-        <main>
+        <section aria-label="创建角色">
           <div className="eyebrow">第一卷 · 烟雨初逢</div>
-          <h1>
-            初入江湖 <Seal>缘起</Seal>
-          </h1>
+          <h2>
+            写下你的故事 <Seal>缘起</Seal>
+          </h2>
           <p className="muted">先写下你的名字，再去遇见这座江湖。</p>
           <form
             onSubmit={(e) => {
@@ -190,7 +190,7 @@ export function Creation({
               </p>
             )}
           </form>
-        </main>
+        </section>
       </div>
     </div>
   );

@@ -98,7 +98,22 @@ export function Character({
                 key={slot}
                 onClick={() => (item ? onItem(item) : navigate("inventory"))}
               >
-                <ItemArt icon={item?.icon || "shirt"} />
+                {item ? (
+                  <ItemArt icon={item.icon} itemId={item.id} />
+                ) : (
+                  <div className="empty-equipment-art" aria-hidden="true">
+                    <Icon
+                      name={
+                        slot === "feet"
+                          ? "footprints"
+                          : slot === "armor"
+                            ? "shirt"
+                            : "sword"
+                      }
+                      size={32}
+                    />
+                  </div>
+                )}
                 <span>
                   <small>{label}</small>
                   <b>

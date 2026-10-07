@@ -50,26 +50,10 @@ export function Jianghu({
       </div>
       <div className={`scene scene-${s.location}`}>
         <ReferenceArt
-          figure={
-            s.location === "lake"
-              ? 1
-              : s.location === "smith"
-                ? 16
-                : s.location === "inn"
-                  ? 11
-                  : 18
-          }
-          rect={
-            s.location === "lake"
-              ? [601, 157, 282, 140]
-              : s.location === "smith"
-                ? [425, 0, 420, 255]
-                : s.location === "inn"
-                  ? [0, 0, 850, 615]
-                  : [410, 0, 440, 250]
-          }
+          figure={8}
+          rect={[391, 0, 363, 244]}
           className="scene-reference"
-          label={l.name + "文档原画场景"}
+          label="杭州山水"
         />
         <div className="scene-title">
           <span>江 南 · 杭 州</span>

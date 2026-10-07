@@ -197,7 +197,7 @@ export function Meter({
         </span>
       </div>
       <div className="meter-track">
-        <i
+        <span
           style={{
             width: `${Math.max(0, Math.min(100, (value / max) * 100))}%`,
           }}
@@ -246,72 +246,43 @@ export function Modal({
   onClose?: () => void;
   wide?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    const prev = document.activeElement as HTMLElement;
+    const dialog = ref.current!;
+    const previous = document.activeElement as HTMLElement;
     const old = document.body.style.overflow;
+    dialog.showModal();
     document.body.style.overflow = "hidden";
-    ref.current?.focus();
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose?.();
-      if (e.key === "Tab") {
-        const nodes = ref.current?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled),input:not(:disabled),select,a[href],[tabindex="0"]',
-        );
-        if (!nodes?.length) return;
-        const first = nodes[0],
-          last = nodes[nodes.length - 1];
-        if (
-          e.shiftKey &&
-          (document.activeElement === first ||
-            document.activeElement === ref.current)
-        ) {
-          e.preventDefault();
-          last.focus();
-        } else if (
-          !e.shiftKey &&
-          (document.activeElement === last ||
-            document.activeElement === ref.current)
-        ) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handler);
     return () => {
+      dialog.close();
       document.body.style.overflow = old;
-      document.removeEventListener("keydown", handler);
-      prev?.focus();
+      previous?.focus();
     };
-  }, [onClose]);
+  }, []);
   return (
-    <div
-      className="modal-shade"
-      onMouseDown={(e) => {
+    <dialog
+      className={`game-dialog ${wide ? "wide" : ""}`}
+      ref={ref}
+      aria-label={title}
+      onCancel={(e) => {
+        if (onClose) onClose();
+        else e.preventDefault();
+      }}
+      onClick={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
     >
-      <div
-        className={`modal ${wide ? "wide" : ""}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        tabIndex={-1}
-        ref={ref}
-      >
-        {onClose && (
-          <div className="modal-close-bar">
-            <button aria-label="关闭" className="icon-button" onClick={onClose}>
+      <div className="dialog-content">
+        <div className="dialog-top">
+          <h2>{title}</h2>
+          {onClose && (
+            <button className="icon-button" aria-label="关闭" onClick={onClose}>
               <Icon name="close" />
             </button>
-          </div>
-        )}
-        <div className="modal-heading">
-          <ReferenceHeader title={title} />
+          )}
         </div>
         <div className="modal-body">{children}</div>
       </div>
-    </div>
+    </dialog>
   );
 }

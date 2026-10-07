@@ -11,6 +11,21 @@ export function WorldMap({
   s: GameState;
   onTravel: (id: string) => void;
 }) {
+  const coordinates: Record<string, [number, number]> = {
+    lake: [18, 35],
+    tower: [49, 16],
+    herb: [82, 20],
+    inn: [48, 45],
+    alley: [81, 45],
+    smith: [18, 72],
+    office: [49, 80],
+    dock: [82, 72],
+  };
+  const places = locations.map((l) => ({
+    ...l,
+    x: coordinates[l.id][0],
+    y: coordinates[l.id][1],
+  }));
   const [selected, setSelected] = useState(s.location);
   const l = locations.find((l) => l.id === selected)!;
   return (
@@ -25,7 +40,7 @@ export function WorldMap({
       <div className="world-map">
         <ReferenceArt
           figure={8}
-          rect={[377, 0, 470, 249]}
+          rect={[391, 0, 363, 244]}
           className="map-reference"
           label="文档原画山水舆图"
         />
@@ -39,11 +54,11 @@ export function WorldMap({
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          {locations.flatMap((l) =>
+          {places.flatMap((l) =>
             l.connections
               .filter((id) => id > l.id)
               .map((id) => {
-                const next = locations.find((x) => x.id === id)!;
+                const next = places.find((x) => x.id === id)!;
                 return (
                   <line
                     key={l.id + id}
@@ -56,7 +71,7 @@ export function WorldMap({
               }),
           )}
         </svg>
-        {locations.map((l) => (
+        {places.map((l) => (
           <button
             key={l.id}
             className={`map-pin ${s.location === l.id ? "current" : ""} ${selected === l.id ? "selected" : ""}`}
