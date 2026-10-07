@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { InkNavIcon, PaperEnding, NavCorners } from "./components/InkOrnaments";
 import { Creation } from "./pages/Creation";
 import { Jianghu } from "./pages/Jianghu";
 import { Character } from "./pages/Character";
@@ -268,12 +269,9 @@ export default function App() {
                 {storageError ? "存档需留意" : "行迹已自动存档"}
               </p>
             </div>
-            <div className="paper-ending">
-              <span />
-              江湖路远 · 自有来处
-              <span />
-            </div>
+            <PaperEnding />
             <nav className="bottom-nav" aria-label="主导航">
+              <NavCorners />
               {navigation.map(([p, label, icon]) => (
                 <button
                   key={p}
@@ -285,7 +283,7 @@ export default function App() {
                   }
                   onClick={() => navigate(p)}
                 >
-                  <Icon name={icon} />
+                  <InkNavIcon name={icon} />
                   <span>{label}</span>
                 </button>
               ))}

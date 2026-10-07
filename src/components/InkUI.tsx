@@ -78,7 +78,7 @@ export function Art({
   );
 }
 const portraits: Record<string, [number, [number, number, number, number]]> = {
-  suwan: [9, [143, 207, 266, 278]],
+  suwan: [9, [104, 202, 314, 292]],
   baizhi: [10, [28, 978, 250, 234]],
   shao: [8, [32, 870, 190, 132]],
   swordsman: [8, [32, 1025, 190, 129]],
@@ -89,16 +89,19 @@ const portraits: Record<string, [number, [number, number, number, number]]> = {
 export function Portrait({
   id,
   className = "",
+  list = false,
 }: {
   id: string;
   className?: string;
+  list?: boolean;
 }) {
   const [figure, rect] = portraits[id];
   return (
     <Art
       figure={figure}
       rect={rect}
-      className={`portrait-art ${className}`}
+      className={`portrait-art ${list ? "list-portrait" : ""} ${className}`}
+      fit="xMidYMid slice"
       label={
         id === "player"
           ? "你的角色肖像"
@@ -120,6 +123,11 @@ export function Header({
     <header className="page-heading">
       <Art figure={8} rect={[391, 0, 363, 244]} className="landscape" />
       <Art figure={8} rect={[0, 0, 70, 164]} className="bamboo" />
+      <div className="heading-inscription" aria-hidden="true">
+        <span>{equipment ? "十年仗剑行天下" : "相逢何必曾相识"}</span>
+        <span>{equipment ? "一器随身伴明月" : "江湖一见即故人"}</span>
+        <i>江湖</i>
+      </div>
       <div className="heading-copy">
         <div className="heading-title">
           <h1>{title || (equipment ? "装备谱" : "人物谱")}</h1>
@@ -191,6 +199,7 @@ export function Panel({
 }) {
   return (
     <section className={`panel ${className}`}>
+      <Art figure={8} rect={[0, 0, 70, 164]} className="panel-bamboo" />
       <h2>
         {icon}
         {title}
@@ -288,7 +297,7 @@ export function People({
             onClick={() => select(n)}
             aria-label={`查看${n.name}`}
           >
-            <Portrait id={n.id} />
+            <Portrait id={n.id} list />
             <div className="person-main">
               <h2>
                 {n.name}
@@ -520,6 +529,21 @@ export function Detail({
               <p className="secondary">你们的故事，还未落笔。</p>
             )}
           </Panel>
+          {n.id === "suwan" && (
+            <div className="profile-vignette">
+              <p>
+                江湖再冷，
+                <br />
+                也总得有一盏热茶热酒。
+              </p>
+              <Art
+                figure={9}
+                rect={[668, 1148, 180, 219]}
+                className="vignette-art"
+              />
+              <span className="seal">故人</span>
+            </div>
+          )}
         </div>
       ) : tab === "关系" ? (
         <Panel title="相处之间" icon={<Heart />}>

@@ -43,6 +43,11 @@ import type { Action } from "../engine/game";
 import { currentNpcLocation } from "../engine/people";
 import type { GameState, Item, NPC } from "../types";
 
+import {
+  InkNavIcon,
+  PaperEnding,
+  NavCorners,
+} from "../components/InkOrnaments";
 import { Header, People, Detail, Equipment } from "../components/InkUI";
 function demoState() {
   const s = createCharacter("沈辞", "escort", ["careful", "sword"], "剑");
@@ -158,36 +163,33 @@ export function Review() {
               <Equipment s={s} act={act} />
             )}
           </div>
-          <div className="paper-ending">
-            <span />
-            江湖路远 · 自有来处
-            <span />
-          </div>
+          <PaperEnding />
           <nav className="bottom-nav" aria-label="主导航">
+            <NavCorners />
             <button
               aria-current={page === "equipment" ? "page" : undefined}
               onClick={() => navigate("equipment")}
             >
-              <Backpack />
+              <InkNavIcon name="bag" />
               <span>行囊</span>
             </button>
             <button
               aria-current={page !== "equipment" ? "page" : undefined}
               onClick={() => navigate("people")}
             >
-              <UsersRound />
+              <InkNavIcon name="users" />
               <span>人物</span>
             </button>
             <button disabled title="此预览仅开放人物与装备">
-              <Mountain />
+              <InkNavIcon name="mountain" />
               <span>江湖</span>
             </button>
             <button disabled title="此预览仅开放人物与装备">
-              <BookOpen />
+              <InkNavIcon name="book" />
               <span>武学</span>
             </button>
             <button disabled title="此预览仅开放人物与装备">
-              <Map />
+              <InkNavIcon name="map" />
               <span>地图</span>
             </button>
           </nav>
