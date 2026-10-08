@@ -1,4 +1,6 @@
 import { DesktopNav } from "./components/DesktopNav";
+import { Trial } from "./pages/Trial";
+import { Guide } from "./pages/Guide";
 import {
   useCallback,
   useEffect,
@@ -35,6 +37,8 @@ import { meets } from "./engine/game";
 import type { NPC, Item, Page } from "./types";
 
 const titles: Record<Page, [string, string]> = {
+  trial: ["问心试炼", "三十层试剑，步步见成长"],
+  guide: ["江湖路引", "先知去处，再行江湖"],
   jianghu: ["江湖行", "山水一程，幸会相逢"],
   character: ["我的人物", "见天地，见众生，见自己"],
   npc: ["人物谱", "江湖中与你相逢的人"],
@@ -44,6 +48,18 @@ const titles: Record<Page, [string, string]> = {
   quest: ["缉捕令", "官府悬赏，循迹追缉"],
   identity: ["身份司簿", "有所担当，方为江湖中人"],
   journal: ["江湖手记", "一笔一划，记下自己的故事"],
+};
+const pageHints: Partial<Record<Page, string>> = {
+  inventory:
+    "点击物品查看详情与换装对比；新装备要点「装备」。在铁匠铺打开装备详情可强化。",
+  arts: "先看上方人物境界，再看下方武学。已有武学点「静心修习」；外功招式点「设为出战」。",
+  map: "先选地图上的地点，再点「动身前往」。查看地图不耗时，实际移动消耗一时辰。",
+  npc: "人物详情可查看所在地。交谈、赠礼与请教需要当面进行；深夜人物可能换地方。",
+  character:
+    "基础属性影响战斗与事件；守关首通获得的潜能可在下方分配。提升气血上限不会自动回血。",
+  quest:
+    "委托与官府案卷各自推进。接下盗案后限八个游戏日完成，步骤与缺少的道具会显示在案卷中。",
+  identity: "捕快是一条可选成长路线。先到官府入职，办案获得贡献后再申请晋升。",
 };
 const navigation: [Page, string, string][] = [
   ["inventory", "行囊", "bag"],
@@ -63,6 +79,7 @@ export default function App() {
     [relations, setRelations] = useState(false),
     [notice, setNotice] = useState("");
   const heading = useRef<HTMLElement>(null);
+  const previousMessage = useRef(s.lastMessage);
   const positions = useRef<Record<string, number>>({});
   const viewKey = `${screen}/${page}/${npc?.id ?? "list"}/${relations}/${page === "jianghu" ? s.location : ""}`;
   const [peopleFilters, setPeopleFilters] = useState({
@@ -103,7 +120,9 @@ export default function App() {
     return () => window.removeEventListener("scroll", remember);
   }, [viewKey]);
   useEffect(() => {
-    if (s.lastMessage && screen === "game") {
+    const changed = previousMessage.current !== s.lastMessage;
+    previousMessage.current = s.lastMessage;
+    if (changed && s.lastMessage && screen === "game") {
       setNotice(s.lastMessage);
       const timer = window.setTimeout(() => setNotice(""), 7000);
       return () => window.clearTimeout(timer);
@@ -142,7 +161,10 @@ export default function App() {
             s={s}
             paused={saveOpen || help}
             onStart={() => setScreen("create")}
-            onContinue={() => setScreen("game")}
+            onContinue={() => {
+              if (s.combat?.kind === "trial") navigate("trial");
+              setScreen("game");
+            }}
             onSave={() => setSaveOpen(true)}
             onHelp={() => setHelp(true)}
           />
@@ -168,6 +190,13 @@ export default function App() {
               </span>
               <span>{timeLabel(s.time)}</span>
               <button
+                className="topbar-guide"
+                onClick={() => navigate("guide")}
+              >
+                <Icon name="compass" size={16} />
+                玩法指引
+              </button>
+              <button
                 className="icon-button"
                 aria-label="存档与设置"
                 onClick={() => setSaveOpen(true)}
@@ -186,6 +215,9 @@ export default function App() {
               }
               equipment={page === "inventory"}
             />
+            {!npc && !relations && pageHints[page] && (
+              <p className="page-hint">{pageHints[page]}</p>
+            )}
             <div
               className={`page-content page-arrival content-${npc ? "detail" : relations ? "relations" : page}`}
               key={`${page}-${npc?.id ?? "list"}-${relations}`}
@@ -277,11 +309,15 @@ export default function App() {
                     <Identity s={s} navigate={navigate} />
                   )}
                   {page === "journal" && <Journal s={s} />}
+                  {page === "trial" && <Trial s={s} navigate={navigate} />}
+                  {page === "guide" && <Guide s={s} navigate={navigate} />}
                 </>
               )}
               <nav className="utility-nav" aria-label="更多功能">
                 {(
                   [
+                    ["guide", "江湖路引"],
+                    ["trial", "试炼塔"],
                     ["character", "我的人物"],
                     ["identity", "身份司簿"],
                     ["quest", "缉捕令"],
@@ -352,6 +388,25 @@ export default function App() {
       {help && (
         <Modal title="初入江湖须知" onClose={closeHelp}>
           <div className="guide-list">
+            <p>
+              <b>第一次玩：</b>
+              先看行囊里的初始装备，再到武学录练一次已学武学，然后去西湖试炼塔挑战第一层。首页会根据你的进度推荐下一步。
+            </p>
+            <p>
+              气血是生命，内力用于出招；修为用于人物破境，熟练度用于武学成长。切换页面不消耗时间，不必一开始就接官府案子。
+            </p>
+            {s.started && (
+              <button
+                className="ink-button full"
+                onClick={() => {
+                  closeHelp();
+                  setScreen("game");
+                  navigate("guide");
+                }}
+              >
+                打开完整路引与玩法路线
+              </button>
+            )}
             <p>
               八处地点都可前往。移动、交谈、修习会推进时辰，入夜后有些人会换个去处。
             </p>

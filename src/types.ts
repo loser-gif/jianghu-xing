@@ -27,6 +27,18 @@ export type GameState = {
   version: 1;
   started: boolean;
   cultivation: Cultivation;
+  trial: {
+    highest: number;
+    wins: number;
+    marks: number;
+    potential: number;
+    rewarded: Record<string, number>;
+    result: null | {
+      floor: number;
+      outcome: "win" | "loss" | "retreat";
+      text: string;
+    };
+  };
   player: {
     gender: "male" | "female";
     name: string;
@@ -64,6 +76,9 @@ export type GameState = {
     failure: string;
   };
   combat: null | {
+    kind?: "trial";
+    floor?: number;
+    advantage?: boolean;
     hp: number;
     maxHp: number;
     round: number;
@@ -152,4 +167,6 @@ export type Page =
   | "map"
   | "quest"
   | "identity"
-  | "journal";
+  | "journal"
+  | "trial"
+  | "guide";

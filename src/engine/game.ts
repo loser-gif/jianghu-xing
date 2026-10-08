@@ -18,11 +18,14 @@ import {
   realms,
 } from "./cultivation";
 import { commissions, commissionStage, introText } from "./sidequests";
+import { initialTrial, resolveTrialRound } from "./trial";
+import { trialFloors, trialExchanges } from "../data/trial";
 
 export const freshState = (): GameState => ({
   version: 1,
   started: false,
   cultivation: initialCultivation(),
+  trial: initialTrial(),
   player: {
     name: "沈辞",
     gender: "male",
@@ -75,6 +78,10 @@ export function derived(s: GameState) {
       s.player.stats.root * 2 +
       (s.player.talents.includes("strong") ? 40 : 0) +
       gear.reduce((n, g) => n + (g?.hp || 0), 0) +
+      gear.reduce(
+        (n, g) => n + (g?.slot !== "weapon" ? (s.upgrades[g!.id] || 0) * 5 : 0),
+        0,
+      ) +
       (set ? 30 : 0),
     maxQi: bonus.qi + 60 + s.player.stats.spirit,
     attack:
@@ -88,7 +95,13 @@ export function derived(s: GameState) {
       bonus.defense +
       5 +
       Math.floor(s.player.stats.root / 12) +
-      gear.reduce((n, g) => n + (g?.defense || 0), 0),
+      gear.reduce(
+        (n, g) =>
+          n +
+          (g?.defense || 0) +
+          (g?.slot !== "weapon" ? (s.upgrades[g!.id] || 0) * 2 : 0),
+        0,
+      ),
     set,
   };
 }
@@ -224,6 +237,10 @@ export function createCharacter(
   return s;
 }
 export type Action =
+  | { type: "attribute"; id: keyof Stats }
+  | { type: "trialEnter"; floor: number }
+  | { type: "trialExchange"; id: string }
+  | { type: "guideCheck" }
   | { type: "meditate" | "ascend" | "skipGuide" }
   | { type: "appearance"; gender: "male" | "female" }
   | { type: "prologue"; id: "help" | "seek" | "skip" }
@@ -278,6 +295,92 @@ export function transition(current: GameState, action: Action): GameState {
     return s;
   }
   switch (action.type) {
+    case "attribute":
+      if (
+        !["root", "insight", "agility", "spirit"].includes(action.id) ||
+        s.trial.potential < 1 ||
+        s.player.stats[action.id] >= 100
+      )
+        break;
+      s.trial.potential--;
+      s.player.stats[action.id]++;
+      note(
+        s,
+        "已消耗 1 点潜能，基础属性 +1。潜能分配不可撤回；提升上限不会自动恢复气血与内力。",
+      );
+      break;
+    case "guideCheck":
+      s.flags.guide_equip = true;
+      note(
+        s,
+        "行装已检查。初始兵器与布衣已装备；下一步到武学录修习，再挑战试炼塔第一层。",
+      );
+      break;
+    case "trialEnter": {
+      const f = trialFloors.find((f) => f.floor === action.floor);
+      if (!f || f.floor > s.trial.highest + 1) {
+        note(s, "需先通关前一层。已通关楼层可随时复战。");
+        break;
+      }
+      if (s.location !== "lake") {
+        note(s, "试炼塔在西湖畔，请先前往西湖。");
+        break;
+      }
+      if (!["locked", "available", "completed", "failed"].includes(stage)) {
+        note(s, "缉捕正在计时，请先处理当前案件，再来试炼。");
+        break;
+      }
+      if (s.player.hp < Math.ceil(derived(s).maxHp * 0.3)) {
+        note(s, "气血低于三成，请先去青山药庐疗伤。试炼不消耗门票。");
+        break;
+      }
+      advance(s);
+      s.trial.result = null;
+      s.combat = {
+        kind: "trial",
+        floor: f.floor,
+        advantage: false,
+        hp: f.hp,
+        maxHp: f.hp,
+        round: 1,
+        guarded: false,
+        logs: [`第 ${f.floor} 层 · ${f.name}。先看敌方意图，再选择行动。`],
+      };
+      note(
+        s,
+        `登上试炼塔第 ${f.floor} 层，消耗一时辰。可随时撤离，保留已通关进度。`,
+      );
+      break;
+    }
+    case "trialExchange": {
+      const e = trialExchanges.find((e) => e.id === action.id);
+      if (!e || s.location !== "lake") {
+        note(s, "请到西湖试炼塔兑换奖励。");
+        break;
+      }
+      if (
+        (e.id === "lightArt" && s.arts.lightArt) ||
+        (["sword", "boots"].includes(e.id) && s.inventory[e.id])
+      ) {
+        note(s, "已经拥有，无需重复兑换。");
+        break;
+      }
+      if (s.trial.marks < e.cost) {
+        note(
+          s,
+          `需要试炼印 ${e.cost}，当前 ${s.trial.marks}。首通楼层可获得。`,
+        );
+        break;
+      }
+      s.trial.marks -= e.cost;
+      if (e.id === "lightArt") s.arts.lightArt = 10;
+      else add(s, e.id, e.count);
+      note(
+        s,
+        `已兑换${e.name}。${e.id === "lightArt" ? "战斗中可施展轻功。" : "可在行囊查看；新装备需要手动装备。"}`,
+      );
+      break;
+    }
     case "appearance":
       s.player.gender = action.gender;
       s.flags.appearance_chosen = true;
@@ -584,10 +687,10 @@ export function transition(current: GameState, action: Action): GameState {
       const id = action.id;
       const item = items.find((i) => i.id === id);
       const level = s.upgrades[id] || 0;
-      if (s.location !== "smith" || !item?.attack || !(s.inventory[id] > 0))
+      if (s.location !== "smith" || !item?.slot || !(s.inventory[id] > 0))
         break;
       if (level >= 5) {
-        note(s, "这柄兵器已强化至本篇上限。");
+        note(s, "这件装备已强化至本篇上限 +5。");
         break;
       }
       const cost = 20 + level * 15;
@@ -600,7 +703,7 @@ export function transition(current: GameState, action: Action): GameState {
       s.upgrades[id] = level + 1;
       note(
         s,
-        `${item.name}强化至 +${level + 1}，攻击增加 3 点。邵远山为你稳妥重铸。`,
+        `${item.name}强化至 +${level + 1}，${item.slot === "weapon" ? "外功增加 3 点" : "防御增加 2 点，气血上限增加 5 点"}。邵远山为你稳妥重铸。`,
       );
       advance(s);
       break;
@@ -801,6 +904,10 @@ export function transition(current: GameState, action: Action): GameState {
     case "fight": {
       const c = s.combat;
       if (!c) break;
+      if (c.kind === "trial") {
+        note(s, resolveTrialRound(s, action.id, derived(s)));
+        break;
+      }
       const d = derived(s);
       let damage = 0,
         defend = false,

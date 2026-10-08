@@ -1,4 +1,5 @@
 import { Arrival, CommissionBoard } from "../components/Progression";
+import { NextStep } from "./Guide";
 import { realms } from "../engine/cultivation";
 import { ItemPicture, ItemStats } from "../components/InkUI";
 import { ReferenceArt } from "../components/Reference";
@@ -54,7 +55,7 @@ export function Jianghu({
         </div>
       </div>
       <Arrival s={s} navigate={navigate} />
-      <CommissionBoard s={s} navigate={navigate} local />
+      <NextStep s={s} navigate={navigate} />
       <div className="journey-columns">
         <div className="journey-landscape">
           <div className={`scene scene-${s.location}`}>
@@ -96,6 +97,12 @@ export function Jianghu({
             aside={<span className="small muted">一步一选择，一念一江湖</span>}
           >
             <div className="actions-list">
+              <ActionRow
+                icon="building"
+                title="问心试炼塔"
+                description="30层挑战 · 首通获修为、精铁和试炼印"
+                onClick={() => navigate("trial")}
+              />
               <ActionRow
                 icon="compass"
                 title="四处走走"
@@ -235,7 +242,7 @@ export function Jianghu({
               {s.location === "smith" && (
                 <Button onClick={() => navigate("inventory")} className="full">
                   <Icon name="hammer" size={16} />
-                  到行囊选择兵器强化
+                  到行囊选择装备强化
                 </Button>
               )}
             </Section>
@@ -291,6 +298,7 @@ export function Jianghu({
           </Section>
         </div>
       </div>
+      <CommissionBoard s={s} navigate={navigate} local />
     </>
   );
 }

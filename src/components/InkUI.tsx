@@ -657,8 +657,16 @@ export function ItemStats({ item, level }: { item: Item; level: number }) {
   return (
     <div className="tags item-stats">
       {item.attack && <span>外功 +{item.attack + level * 3}</span>}
-      {item.defense && <span>防御 +{item.defense}</span>}
-      {item.hp && <span>气血 +{item.hp}</span>}
+      {item.defense && (
+        <span>
+          防御 +{item.defense + (item.slot !== "weapon" ? level * 2 : 0)}
+        </span>
+      )}
+      {(item.hp || (item.slot && item.slot !== "weapon" && level > 0)) && (
+        <span>
+          气血 +{(item.hp || 0) + (item.slot !== "weapon" ? level * 5 : 0)}
+        </span>
+      )}
     </div>
   );
 }
@@ -738,7 +746,7 @@ export function Equipment({
           {!s.flags.guide_equip && (
             <button
               className="text-button"
-              onClick={() => act({ type: "equip", id: s.equipped.weapon })}
+              onClick={() => act({ type: "guideCheck" })}
             >
               检查行装 · 确认随身兵器
             </button>
@@ -1019,12 +1027,12 @@ export function ItemDialog({
             {s.equipped[item.slot] === item.id ? "已装备" : "装备此物"}
           </button>
         )}
-        {item.attack && (
+        {item.slot && (
           <Panel title="百炼成锋" icon={<Sword />}>
             <p>
               {level >= 5
                 ? "已达本篇强化上限 +5"
-                : `强化 +${level} → +${level + 1} · 外功 +3`}
+                : `强化 +${level} → +${level + 1} · ${item.slot === "weapon" ? "外功 +3" : "防御 +2 / 气血上限 +5"}`}
             </p>
             <p className="secondary">
               需要精铁 2 块（持有 {s.inventory.iron || 0}）<br />
@@ -1049,7 +1057,7 @@ export function ItemDialog({
               {level >= 5
                 ? "已达强化上限"
                 : s.location === "smith"
-                  ? "强化兵器"
+                  ? "强化装备"
                   : "前往铁匠铺 · 一时辰"}
             </button>
           </Panel>

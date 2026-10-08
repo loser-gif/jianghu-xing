@@ -63,6 +63,10 @@ export function Character({
       </div>
       <CultivationPanel s={s} />
       <Section title="根骨心性">
+        <p className="small muted">
+          可用潜能 {s.trial.potential} · 试炼塔每5层守关首通获得4点。每次分配
+          +1，最高100；分配不可撤回。
+        </p>
         <div className="attribute-grid">
           {(
             [
@@ -75,6 +79,14 @@ export function Character({
             <div key={key}>
               <span>{label}</span>
               <strong>{s.player.stats[key]}</strong>
+              <button
+                className="outline-button"
+                disabled={s.trial.potential < 1 || s.player.stats[key] >= 100}
+                onClick={() => act({ type: "attribute", id: key })}
+                aria-label={`提升${label}`}
+              >
+                潜能 +1
+              </button>
               <i>
                 <b style={{ width: `${s.player.stats[key]}%` }} />
               </i>

@@ -1,4 +1,6 @@
 import { realms } from "../engine/cultivation";
+import { trialFloors } from "../data/trial";
+import { trialIntent } from "../engine/trial";
 import { useGame } from "../store";
 import { arts } from "../data/world";
 import { Icon, Portrait, Button, Meter, Modal } from "../components/UI";
@@ -42,6 +44,8 @@ export function Combat({ s }: { s: GameState }) {
   const c = s.combat!,
     d = derived(s),
     art = arts.find((a) => a.id === s.activeArt)!;
+  const trial = c.kind === "trial" ? trialFloors[c.floor! - 1] : null;
+  const intent = trial ? trialIntent(trial.floor, c.round) : null;
   const previous = useRef({ round: c.round, player: s.player.hp, enemy: c.hp });
   const [pulse, setPulse] = useState<{
     round: number;
@@ -61,9 +65,13 @@ export function Combat({ s }: { s: GameState }) {
     return () => window.clearTimeout(timer);
   }, [c.round, c.hp, s.player.hp]);
   return (
-    <Modal title="旧码头 · 交锋" wide>
+    <Modal
+      title={trial ? `问心试炼 · 第${trial.floor}层` : "旧码头 · 交锋"}
+      wide
+    >
       <div className="combat-round">
-        第 {c.round} 回合 <span>活捉 · 非致命交锋</span>
+        第 {c.round} 回合{" "}
+        <span>{trial ? "切磋 · 可随时撤离" : "活捉 · 非致命交锋"}</span>
       </div>
       <div className="combatants">
         <div>
@@ -82,21 +90,46 @@ export function Combat({ s }: { s: GameState }) {
           交<br />锋
         </span>
         <div>
-          <CombatPortrait
-            index={5}
-            delta={pulse?.enemy}
-            round={pulse?.round ?? c.round}
-          />
-          <h3>顾红绫 · 八品</h3>
+          {trial ? (
+            <div className="trial-opponent" aria-label={trial.name}>
+              <Icon name={trial.boss ? "shield" : "swords"} />
+              <span>{trial.boss ? "守关" : "试剑"}</span>
+            </div>
+          ) : (
+            <CombatPortrait
+              index={5}
+              delta={pulse?.enemy}
+              round={pulse?.round ?? c.round}
+            />
+          )}
+          <h3>{trial ? trial.name : "顾红绫 · 八品"}</h3>
           <Meter label="气血" value={c.hp} max={c.maxHp} color="red" />
-          <p className="small muted">身轻如燕 · 每三回合使出燕返</p>
+          <p className="small muted">
+            {trial
+              ? `${trial.style} · 防御 ${trial.defense}`
+              : "身轻如燕 · 每三回合使出燕返"}
+          </p>
         </div>
       </div>
       <p className="combat-intent">
-        {c.round % 3 === 0
-          ? "敌方意图：燕返重击（基础 44）· 宜防守或轻功闪避"
-          : "敌方意图：试探进攻（基础 32）· 防御会抵消部分伤害"}
+        {intent
+          ? `敌方意图：${intent.label}（基础伤害 ${intent.power}）· ${intent.hint}`
+          : c.round % 3 === 0
+            ? "敌方意图：燕返重击（基础 44）· 宜防守或轻功闪避"
+            : "敌方意图：试探进攻（基础 32）· 防御会抵消部分伤害"}
       </p>
+      {c.advantage && (
+        <p className="trial-advantage">反击机会已就绪 · 下一次攻击伤害 +50%</p>
+      )}
+      {trial && (
+        <p className="small">
+          {intent?.kind === "guard"
+            ? "建议：内力充足时施展武学，破开守势。"
+            : intent?.kind === "heavy"
+              ? "建议：防御调息或轻功，化解重击后再进攻。"
+              : "建议：把握换气破绽，使用武学或普通攻击。"}
+        </p>
+      )}
       <div className="combat-log" aria-live="polite">
         {c.logs.slice(0, 5).map((l, i) => (
           <p key={`${c.round}-${i}`} className={i === 0 ? "latest" : ""}>
@@ -108,6 +141,7 @@ export function Combat({ s }: { s: GameState }) {
         <Button kind="ink" onClick={() => act({ type: "fight", id: "attack" })}>
           <Icon name="sword" size={17} />
           普通攻击
+          <small>不消耗内力</small>
         </Button>
         <Button
           disabled={s.player.qi < art.cost}
@@ -120,13 +154,17 @@ export function Combat({ s }: { s: GameState }) {
         <Button onClick={() => act({ type: "fight", id: "defend" })}>
           <Icon name="shield" size={17} />
           防御调息
+          <small>减伤并回内力</small>
         </Button>
         <Button
           disabled={!s.arts.lightArt || s.player.qi < 8}
           onClick={() => act({ type: "fight", id: "light" })}
         >
           <Icon name="wind" size={17} />
-          追云步<small>8 内力</small>
+          追云步
+          <small>
+            {!s.arts.lightArt ? "尚未学会 · 试炼塔可兑换" : "8 内力"}
+          </small>
         </Button>
         <Button
           disabled={!(s.inventory.medicine > 0) || s.player.hp >= d.maxHp}
@@ -139,12 +177,15 @@ export function Combat({ s }: { s: GameState }) {
           kind="danger"
           onClick={() => act({ type: "fight", id: "escape" })}
         >
-          撤离 · 本次缉捕失败
+          {trial ? "撤离 · 保留通关进度" : "撤离 · 本次缉捕失败"}
         </Button>
       </div>
       <p className="small muted">
-        普通攻击无需内力；防御减伤并恢复 14
-        内力；道具占用一回合。每次行动均自动存档。
+        普通攻击无需内力；防御减伤并调息；道具占用一回合。
+        {trial
+          ? "归元心法熟练度提高防御回气，兵器适配出战武学可增加20%招式伤害。"
+          : "防御恢复14内力。"}
+        每次行动均自动存档。
       </p>
       <div className="inline-feedback" role="status">
         {s.lastMessage}

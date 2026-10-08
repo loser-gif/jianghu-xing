@@ -61,11 +61,16 @@ export function breakthroughNeeds(s: GameState) {
       met: s.cultivation.insights >= n - 1,
     });
   if (n >= 6)
-    needs.push({ label: "完成烟雨楼盗案", met: s.quest.stage === "completed" });
+    needs.push({
+      label: "完成烟雨楼盗案，或通关试炼塔15层",
+      met: s.quest.stage === "completed" || s.trial.highest >= 15,
+    });
   if (n >= 9)
     needs.push({
-      label: "三段江湖委托皆已了结",
-      met: ["inn", "herb", "escort"].every((id) => s.flags[`side_${id}`] === 3),
+      label: "三段委托了结，或通关试炼塔25层",
+      met:
+        s.trial.highest >= 25 ||
+        ["inn", "herb", "escort"].every((id) => s.flags[`side_${id}`] === 3),
     });
   if (n >= 11)
     needs.push({

@@ -2,6 +2,7 @@ import type { GameState } from "../types";
 import { locations, items, arts, npcs } from "../data/world";
 import { events } from "../data/events";
 import { initialCultivation } from "./cultivation";
+import { initialTrial } from "./trial";
 export const SAVE_PREFIX = "jianghu.v1.";
 export type SaveRecord = { version: 1; savedAt: string; state: GameState };
 function isObject(v: unknown): v is Record<string, unknown> {
@@ -47,6 +48,31 @@ export function validState(v: unknown): v is GameState {
   }
   const p = v.player,
     q = v.quest;
+  if (v.trial !== undefined) {
+    const t = v.trial;
+    if (
+      !isObject(t) ||
+      !["highest", "wins", "marks", "potential"].every(
+        (k) => Number.isSafeInteger(t[k]) && Number(t[k]) >= 0,
+      ) ||
+      Number(t.highest) > 30 ||
+      !numbers(t.rewarded) ||
+      !Object.entries(t.rewarded as Record<string, number>).every(
+        ([floor, day]) =>
+          /^([1-9]|[12][0-9]|30)$/.test(floor) && Number.isSafeInteger(day),
+      ) ||
+      !(
+        t.result === null ||
+        (isObject(t.result) &&
+          Number.isInteger(t.result.floor) &&
+          Number(t.result.floor) >= 1 &&
+          Number(t.result.floor) <= 30 &&
+          ["win", "loss", "retreat"].includes(String(t.result.outcome)) &&
+          typeof t.result.text === "string")
+      )
+    )
+      return false;
+  }
   if (
     typeof p.name !== "string" ||
     p.name.length > 12 ||
@@ -168,8 +194,29 @@ export function validState(v: unknown): v is GameState {
       !c.logs.every((l) => typeof l === "string")
     )
       return false;
+    if (c.kind !== undefined && c.kind !== "trial") return false;
+    if (
+      c.kind === "trial" &&
+      (!isObject(v.trial) ||
+        !Number.isInteger(c.floor) ||
+        Number(c.floor) < 1 ||
+        Number(c.floor) > 30 ||
+        Number(c.floor) > Number(v.trial.highest) + 1 ||
+        typeof c.advantage !== "boolean" ||
+        Number(c.round) < 1 ||
+        Number(c.hp) <= 0 ||
+        Number(c.hp) > Number(c.maxHp))
+    )
+      return false;
   }
-  if ((q.stage === "combat") !== (v.combat !== null)) return false;
+  const trialCombat = isObject(v.combat) && v.combat.kind === "trial";
+  if (
+    trialCombat &&
+    !["locked", "available", "completed", "failed"].includes(String(q.stage))
+  )
+    return false;
+  if ((q.stage === "combat") !== (v.combat !== null && !trialCombat))
+    return false;
   return true;
 }
 export function parseSave(raw: string): SaveRecord {
@@ -182,6 +229,7 @@ export function parseSave(raw: string): SaveRecord {
   )
     throw new Error("存档格式不兼容或内容损坏。当前进度未被更改。");
   const s = data.state as GameState;
+  if (!s.trial) s.trial = initialTrial();
   if (!s.player.gender) {
     s.player.gender = "male";
     s.flags.appearance_chosen = false;

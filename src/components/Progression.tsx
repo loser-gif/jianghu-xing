@@ -107,63 +107,7 @@ export function Arrival({
         </p>
       </section>
     );
-  if (s.flags.guide_dismissed) return null;
-  const steps: { flag: string; title: string; text: string; page: Page }[] = [
-    {
-      flag: "guide_explore",
-      title: "看见江湖",
-      text: "在「此地可为」四处走走，并回应一段际遇。",
-      page: "jianghu",
-    },
-    {
-      flag: "guide_talk",
-      title: "结识一人",
-      text: "在当前地点与一名人物交谈。人物谱可查行踪。",
-      page: "npc",
-    },
-    {
-      flag: "guide_equip",
-      title: "整理行装",
-      text: "在行囊检查初始装备，或购置新装备后换上。",
-      page: "inventory",
-    },
-    {
-      flag: "guide_practice",
-      title: "静心修习",
-      text: "到武学录修习归元心法，积累熟练度与修为。",
-      page: "arts",
-    },
-    {
-      flag: "guide_spar",
-      title: "湖畔试剑",
-      text: "回西湖与剑客切磋；会消耗 20 气血，可先去药庐疗伤。",
-      page: "map",
-    },
-  ];
-  const next = steps.find((x) => !s.flags[x.flag]);
-  return (
-    <section className="arrival-guide">
-      <div>
-        <span className="eyebrow">
-          初行五事 · {steps.filter((x) => s.flags[x.flag]).length}/5
-        </span>
-        <h3>{next?.title || "你已能独自行走江湖"}</h3>
-        <p>
-          {next?.text ||
-            "向客栈、药庐和铁匠铺的人问一问委托，再到官府接下烟雨楼盗案。"}
-        </p>
-      </div>
-      <div className="progression-buttons">
-        {next && <Button onClick={() => navigate(next.page)}>前往</Button>}
-        <button
-          className="text-button"
-          onClick={() => act({ type: "skipGuide" })}
-        >
-          {next ? "收起引导" : "收起"}
-        </button>
-      </div>
-    </section>
-  );
+  return null;
 }
 
 export function CommissionBoard({

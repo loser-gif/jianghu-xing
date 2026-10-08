@@ -6298,3 +6298,452 @@ html {
     animation: none !important;
   }
 }
+/* Sandbox progression and a visible route through the first session. */
+.topbar-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+  font-size: 14px;
+}
+.next-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 26px;
+  border: 1px solid #a3ac91;
+  border-left: 4px solid #7d896b;
+  background: #e0e6cd35;
+  margin-bottom: 24px;
+}
+.next-step h2 {
+  font-size: 24px;
+  margin: 7px 0;
+}
+.next-step p {
+  max-width: 750px;
+  font-size: 15px;
+}
+.next-step > .progression-buttons {
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+.guide-start,
+.guide-glossary,
+.trial-intro,
+.trial-result,
+.trial-floors,
+.trial-preparation {
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-bottom: 24px;
+  background: #f5f2e92b;
+}
+.guide-start h2,
+.guide-glossary h2,
+.trial-intro h2,
+.trial-result h2,
+.trial-floors h2,
+.trial-preparation h2,
+.trial-exchange h2 {
+  margin-bottom: 12px;
+}
+.guide-start ol {
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+.guide-start li {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.guide-start li > span {
+  display: block;
+  font:
+    28px DocumentBrush,
+    serif;
+  color: #99957e;
+}
+.guide-start li.done {
+  color: #526d49;
+}
+.guide-start li.done > span {
+  color: #526d49;
+}
+.guide-routes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0 26px;
+}
+.guide-routes article {
+  border: 1px solid var(--line);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.guide-routes article h2 {
+  font-size: 23px;
+}
+.guide-routes article p {
+  font-size: 15px;
+}
+.guide-routes article .button {
+  margin-top: auto;
+}
+.guide-glossary dl,
+.trial-preparation dl {
+  margin: 16px 0;
+}
+.guide-glossary dt,
+.trial-preparation dt {
+  font-weight: 700;
+  margin-top: 15px;
+}
+.guide-glossary dd,
+.trial-preparation dd {
+  margin: 5px 0 16px;
+  line-height: 1.8;
+  font-size: 15px;
+}
+.trial-intro {
+  background: linear-gradient(120deg, #a4b19420, #f8f3e900);
+}
+.trial-intro h2 {
+  font:
+    36px DocumentBrush,
+    serif;
+  margin-top: 12px;
+}
+.trial-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 20px;
+}
+.trial-totals b {
+  margin-left: 8px;
+  color: #58674a;
+}
+.trial-result {
+  border-left: 4px solid #9c7a55;
+}
+.trial-result.win {
+  border-left-color: #6e855c;
+}
+.trial-result .progression-buttons {
+  margin-top: 14px;
+}
+.trial-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+  gap: 24px;
+  align-items: start;
+}
+.floor-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 20px;
+}
+.floor-grid button {
+  border: 1px solid var(--line);
+  min-height: 72px;
+  padding: 8px 2px;
+}
+.floor-grid button b,
+.floor-grid button small {
+  display: block;
+}
+.floor-grid button b {
+  font:
+    25px DocumentBrush,
+    serif;
+  margin-bottom: 3px;
+}
+.floor-grid button small {
+  font-size: 12px;
+}
+.floor-grid .boss {
+  border: 3px double #a48c5f;
+}
+.floor-grid .locked {
+  color: #858473;
+  background: #8b907009;
+}
+.floor-grid button[aria-pressed="true"] {
+  background: #3b4838;
+  color: #f8eed7;
+  outline: 1px solid #d6c795;
+  outline-offset: -5px;
+}
+.trial-preparation {
+  position: sticky;
+  top: 24px;
+}
+.trial-preparation strong {
+  display: block;
+  color: #6c7858;
+  font-size: 14px;
+}
+.trial-preparation > .button {
+  width: 100%;
+  margin-top: 12px;
+}
+.trial-preparation > .small {
+  margin-top: 10px;
+}
+.trial-rules {
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.trial-rules summary {
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.trial-rules p {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.trial-opponent {
+  width: 150px;
+  height: 150px;
+  margin: 8px auto 16px;
+  border: 3px double #9da78b;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background: radial-gradient(#aebd9438, transparent);
+  color: #607453;
+}
+.trial-opponent > svg {
+  width: 52px !important;
+  height: 52px !important;
+}
+.trial-opponent span {
+  font:
+    28px DocumentBrush,
+    serif;
+}
+.trial-advantage {
+  color: #526d44;
+  border-left: 3px solid #8c9b6d;
+  padding: 8px 14px;
+  margin: 10px 0;
+}
+.combat-actions small {
+  width: 100%;
+  font-size: 12px;
+}
+.attribute-grid .outline-button {
+  font-size: 12px;
+  padding: 4px 10px;
+  margin-top: 8px;
+}
+@media (min-width: 1100px) {
+  .desktop-sidebar nav {
+    gap: 2px;
+    padding: 12px 0;
+  }
+  .desktop-sidebar nav button {
+    min-height: 38px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+  .desktop-colophon {
+    display: none;
+  }
+}
+@media (max-width: 1099px) {
+  .guide-routes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .trial-layout {
+    grid-template-columns: 1fr;
+  }
+  .trial-preparation {
+    position: static;
+  }
+  .next-step {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .next-step > .progression-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 600px) {
+  .next-step,
+  .guide-start,
+  .guide-glossary,
+  .trial-intro,
+  .trial-result,
+  .trial-floors,
+  .trial-preparation {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .next-step h2 {
+    font-size: 21px;
+  }
+  .guide-start ol {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .guide-start li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .guide-start li > span {
+    font-size: 23px;
+  }
+  .guide-routes {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .guide-routes article {
+    padding: 18px;
+  }
+  .trial-totals {
+    gap: 10px;
+    font-size: 14px;
+  }
+  .floor-grid {
+    gap: 6px;
+  }
+  .floor-grid button {
+    min-height: 60px;
+  }
+  .trial-intro h2 {
+    font-size: 29px;
+  }
+  .trial-opponent {
+    width: 90px;
+    height: 120px;
+    border-radius: 3px;
+  }
+  .trial-opponent > svg {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  .trial-opponent span {
+    font-size: 22px;
+  }
+  .game-topbar .topbar-guide {
+    order: 3;
+    margin-left: auto;
+    font-size: 12px;
+  }
+  .game-topbar {
+    justify-content: flex-start;
+  }
+}
+
+.page-hint {
+  margin: 0 28px 18px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--gold);
+  background: rgba(138, 120, 76, 0.07);
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+@media (max-width: 600px) {
+  .page-hint {
+    margin: 0 16px 14px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .combat-round {
+    margin-bottom: 10px;
+  }
+  .combatants .portrait {
+    width: 64px;
+    height: 72px;
+    margin-bottom: 4px;
+  }
+  .combat-portrait {
+    width: 64px;
+  }
+  .combatants h3 {
+    font-size: 16px;
+    line-height: 1.4;
+    margin: 6px 0 8px;
+  }
+  .combatants .meter {
+    margin-bottom: 8px;
+  }
+  .combatants .meter > div:first-child {
+    font-size: 14px;
+  }
+  .combatants .trial-opponent {
+    width: 64px;
+    height: 72px;
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+  .combatants .trial-opponent svg {
+    width: 28px;
+    height: 28px;
+  }
+  .combat-intent {
+    margin: 10px 0 4px;
+    padding: 9px 11px;
+    font-size: 14px;
+  }
+  .combat-log {
+    max-height: 100px;
+    margin: 10px 0;
+    padding: 8px 10px;
+  }
+  .combat-actions {
+    gap: 7px;
+    margin: 10px 0;
+  }
+  .combat-actions .button {
+    min-height: 48px;
+    padding: 8px 6px;
+    font-size: 14px;
+    gap: 3px;
+  }
+  .combat-actions .button small {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .combatants .trial-opponent {
+    gap: 3px;
+  }
+  .combatants .trial-opponent svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .combatants .trial-opponent span {
+    font-size: 19px;
+  }
+  .trial-preparation {
+    grid-row: 1;
+  }
+}
