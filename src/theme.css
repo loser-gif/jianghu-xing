@@ -3859,19 +3859,215 @@ dialog::backdrop {
   mix-blend-mode: screen;
   opacity: 0.42;
 }
-.opening-motes {
+.opening-weather-plane {
+  position: absolute;
+  top: 0;
+  width: 1024px;
+  height: 1536px;
+  transform-origin: left top;
+  pointer-events: none;
+}
+.opening-weather-plane .opening-moonlight {
+  background: radial-gradient(
+    ellipse 175px 155px at 729px 210px,
+    #fff5d14d,
+    transparent
+  );
+  animation: moon-breath 19s ease-in-out infinite alternate;
+}
+/* Each cloud is a static, softly feathered field moved by the compositor.
+   The fixed valley masks keep the dark ridgelines clear of the passing mist. */
+.opening-high-cloud {
+  position: absolute;
+  left: 400px;
+  top: 85px;
+  width: 680px;
+  height: 225px;
+  background:
+    radial-gradient(ellipse 43% 20% at 25% 56%, #71858a66, transparent 75%),
+    radial-gradient(ellipse 38% 17% at 73% 42%, #b5bfc066, transparent 74%);
+  animation: high-cloud-passage 49s ease-in-out infinite alternate;
+}
+.opening-valley {
+  position: absolute;
+  overflow: hidden;
+  mask-image: radial-gradient(ellipse, #000 20%, transparent 71%);
+}
+.opening-valley i {
+  position: absolute;
+  inset: -15% -45%;
+  background:
+    radial-gradient(ellipse 27% 22% at 16% 52%, #f1f1e9bf, transparent 72%),
+    radial-gradient(ellipse 33% 27% at 49% 47%, #e8eeebcc, transparent 73%),
+    radial-gradient(ellipse 27% 19% at 84% 58%, #eef2ecb3, transparent 74%);
+  animation: valley-passage 31s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.opening-valley-far {
+  left: 40px;
+  top: 345px;
+  width: 670px;
+  height: 245px;
+  opacity: 0.43;
+  transform: rotate(-9deg);
+}
+.opening-valley-far i {
+  animation-duration: 43s;
+  animation-delay: -17s;
+}
+.opening-valley-middle {
+  left: 380px;
+  top: 595px;
+  width: 670px;
+  height: 320px;
+  opacity: 0.55;
+  transform: rotate(-27deg);
+}
+.opening-valley-middle i {
+  animation-delay: -11s;
+}
+.opening-valley-near {
+  left: 485px;
+  top: 1130px;
+  width: 630px;
+  height: 330px;
+  opacity: 0.45;
+  transform: rotate(-36deg);
+}
+.opening-valley-near i {
+  animation-duration: 23s;
+  animation-delay: -6s;
+}
+.opening-water {
+  position: absolute;
+  left: 487px;
+  top: 878px;
+  width: 246px;
+  height: 112px;
+  overflow: hidden;
+  mask-image: radial-gradient(ellipse, #000 22%, transparent 69%);
+  transform: rotate(-4deg);
+}
+.opening-water i {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    177deg,
+    transparent 0 12px,
+    #f5d59780 13px,
+    transparent 15px 22px
+  );
+  mask-image: radial-gradient(ellipse 16% 70% at 60% 50%, #000, transparent);
+  opacity: 0.15;
+  animation: water-shimmer 7s ease-in-out infinite alternate;
+}
+.opening-water i:nth-child(2) {
+  left: -85px;
+  animation-delay: -3s;
+  animation-duration: 9s;
+}
+.opening-water i:nth-child(3) {
+  left: 46px;
+  animation-delay: -5s;
+  animation-duration: 11s;
+}
+.opening-wind-leaves {
   position: absolute;
   inset: 0;
 }
-.opening-motes i {
+.opening-wind-leaves > span {
   position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #f1d497;
-  box-shadow: 0 0 7px 2px #ecd4a240;
-  animation: mote-drift 14s linear infinite;
+  left: -55px;
+  top: 830px;
+  width: 14px;
+  height: 6px;
   opacity: 0;
+  animation: wind-leaf-path 31s linear infinite;
+}
+.opening-wind-leaves i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 90% 0 90% 0;
+  background: #263a3c;
+  animation: wind-leaf-turn 3.7s ease-in-out infinite alternate;
+}
+.opening-wind-leaves > span:nth-child(even) {
+  top: 1005px;
+  width: 10px;
+  height: 4px;
+}
+.opening-wind-leaves > span:nth-child(3n) {
+  top: 730px;
+}
+@keyframes moon-breath {
+  from {
+    opacity: 0.23;
+  }
+  to {
+    opacity: 0.47;
+  }
+}
+@keyframes high-cloud-passage {
+  from {
+    transform: translate(-170px, -6px);
+    opacity: 0.58;
+  }
+  to {
+    transform: translate(145px, 18px);
+    opacity: 0.87;
+  }
+}
+@keyframes valley-passage {
+  from {
+    transform: translate(-110px, 14px) scaleY(0.88);
+  }
+  to {
+    transform: translate(120px, -15px) scaleY(1.15);
+  }
+}
+@keyframes water-shimmer {
+  from {
+    transform: translate(-4px, -2px) scaleX(0.85);
+    opacity: 0.12;
+  }
+  to {
+    transform: translate(5px, 3px) scaleX(1.13);
+    opacity: 0.3;
+  }
+}
+@keyframes wind-leaf-path {
+  0%,
+  15% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  19% {
+    opacity: 0.58;
+  }
+  38% {
+    transform: translate(250px, -82px);
+  }
+  58% {
+    transform: translate(580px, -36px);
+    opacity: 0.42;
+  }
+  77% {
+    transform: translate(900px, -133px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(1120px, -170px);
+    opacity: 0;
+  }
+}
+@keyframes wind-leaf-turn {
+  from {
+    transform: rotate(-32deg) scaleY(0.3);
+  }
+  to {
+    transform: rotate(175deg) scaleY(1);
+  }
 }
 .motion-paused .opening-painting,
 .motion-paused .opening-atmosphere * {
@@ -3895,28 +4091,12 @@ dialog::backdrop {
 .opening-motion-control:disabled {
   color: #344347;
 }
-@keyframes mote-drift {
-  0% {
-    transform: translate(0, 18px);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.6;
-  }
-  75% {
-    opacity: 0.3;
-  }
-  100% {
-    transform: translate(22px, -46px);
-    opacity: 0;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .opening-painting,
   .opening-atmosphere * {
     animation: none !important;
   }
-  .opening-motes {
+  .opening-wind-leaves {
     display: none;
   }
 }

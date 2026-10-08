@@ -1,7 +1,8 @@
 import { locations, timeLabel } from "../data/world";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { artUrl } from "../artAssets";
 import { LiveLandscape } from "../components/LiveLandscape";
+import { MenuAtmosphere } from "../components/MenuAtmosphere";
 import type { GameState } from "../types";
 
 export function MainMenu({
@@ -27,6 +28,8 @@ export function MainMenu({
     }
   });
   const [visible, setVisible] = useState(!document.hidden);
+  const menu = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(true);
   const [unavailable, setUnavailable] = useState(false);
   const [reduced, setReduced] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -42,10 +45,20 @@ export function MainMenu({
       document.removeEventListener("visibilitychange", visibility);
     };
   }, []);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) =>
+      setInView(entry.isIntersecting),
+    );
+    observer.observe(menu.current!);
+    return () => observer.disconnect();
+  }, []);
+  const playing = motion && visible && inView && !reduced && !paused;
   const location = locations.find((place) => place.id === s.location)?.name;
   return (
     <section
-      className={`opening-menu ${motion && visible && !reduced && !paused && !unavailable ? "motion-playing" : "motion-paused"}`}
+      ref={menu}
+      className={`opening-menu ${playing ? "motion-playing" : "motion-paused"}`}
+      data-motion-quality={unavailable ? "lightweight" : "layered"}
       aria-label="江湖行主菜单"
     >
       <img
@@ -56,30 +69,18 @@ export function MainMenu({
         fetchPriority="high"
       />
       <LiveLandscape
-        playing={motion && visible && !reduced && !paused && !unavailable}
+        playing={playing && !unavailable}
         onUnavailable={setUnavailable}
       />
       <div className="opening-wash" aria-hidden="true" />
-      <div className="opening-atmosphere" aria-hidden="true">
-        <div className="opening-moonlight" />
-        <div className="opening-motes">
-          {Array.from({ length: 10 }, (_, index) => (
-            <i
-              key={index}
-              style={{
-                left: `${12 + ((index * 23) % 78)}%`,
-                top: `${48 + ((index * 13) % 43)}%`,
-                animationDelay: `${-index * 1.7}s`,
-                animationDuration: `${10 + (index % 4) * 3}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
+      <MenuAtmosphere />
       <button
         className="opening-motion-control"
-        disabled={reduced || unavailable}
-        aria-pressed={!motion || reduced || unavailable}
+        disabled={reduced}
+        aria-pressed={!motion || reduced}
+        title={
+          unavailable ? "轻量动态画卷：保留流云、山雾与风叶" : "分层动态画卷"
+        }
         onClick={() => {
           setMotion(!motion);
           try {
@@ -89,7 +90,7 @@ export function MainMenu({
           }
         }}
       >
-        {reduced || unavailable ? "静态画面" : motion ? "暂停动效" : "开启动效"}
+        {reduced ? "静态画面" : motion ? "暂停动效" : "开启动效"}
       </button>
       <header className="opening-heading">
         <h1 aria-label="江湖行">
