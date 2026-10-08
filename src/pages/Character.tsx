@@ -1,3 +1,5 @@
+import { CultivationPanel } from "../components/Progression";
+import { useGame } from "../store";
 import { ItemArt } from "../components/Reference";
 import { origins, talents, items } from "../data/world";
 import { Icon, Portrait, Seal, Section, Meter } from "../components/UI";
@@ -14,10 +16,11 @@ export function Character({
   onItem: (i: Item) => void;
 }) {
   const d = derived(s);
+  const act = useGame((x) => x.act);
   return (
     <>
       <div className="character-hero">
-        <Portrait size="hero" />
+        <Portrait gender={s.player.gender} size="hero" />
         <div>
           <span className="eyebrow">江南行客</span>
           <h1>
@@ -40,6 +43,25 @@ export function Character({
           </div>
         </div>
       </div>
+      <div className="appearance-options">
+        <span>
+          {s.flags.appearance_chosen === false
+            ? "旧存档已保留。选择你的形貌："
+            : "人物形貌"}
+        </span>
+        {(["male", "female"] as const).map((g) => (
+          <button
+            className="text-button"
+            aria-pressed={s.player.gender === g}
+            key={g}
+            onClick={() => act({ type: "appearance", gender: g })}
+          >
+            {g === "male" ? "少侠" : "女侠"}
+            {s.player.gender === g ? " ✓" : ""}
+          </button>
+        ))}
+      </div>
+      <CultivationPanel s={s} />
       <Section title="根骨心性">
         <div className="attribute-grid">
           {(

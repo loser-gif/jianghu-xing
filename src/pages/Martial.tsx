@@ -1,3 +1,4 @@
+import { CultivationPanel } from "../components/Progression";
 import { Tabs } from "../components/InkUI";
 import { useState } from "react";
 import { useGame } from "../store";
@@ -16,6 +17,7 @@ export function Martial({
   const [filter, setFilter] = useState("全部");
   return (
     <>
+      <CultivationPanel s={s} />
       <div className="martial-intro">
         <Icon name="book" size={34} />
         <p>

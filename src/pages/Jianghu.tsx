@@ -1,3 +1,5 @@
+import { Arrival, CommissionBoard } from "../components/Progression";
+import { realms } from "../engine/cultivation";
 import { ItemPicture, ItemStats } from "../components/InkUI";
 import { ReferenceArt } from "../components/Reference";
 import { derived } from "../engine/game";
@@ -32,10 +34,12 @@ export function Jianghu({
   return (
     <>
       <div className="journey-status">
-        <Portrait size="small" />
+        <Portrait gender={s.player.gender} size="small" />
         <div>
           <b>{s.player.name}</b>
-          <small>杭州 · {l.name}</small>
+          <small>
+            {realms[s.cultivation.realm]} · {l.name}
+          </small>
         </div>
         <div>
           <span>
@@ -49,6 +53,8 @@ export function Jianghu({
           </small>
         </div>
       </div>
+      <Arrival s={s} navigate={navigate} />
+      <CommissionBoard s={s} navigate={navigate} local />
       <div className={`scene scene-${s.location}`}>
         <ReferenceArt
           figure={8}

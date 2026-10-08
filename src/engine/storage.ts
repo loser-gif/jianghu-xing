@@ -1,6 +1,7 @@
 import type { GameState } from "../types";
 import { locations, items, arts, npcs } from "../data/world";
 import { events } from "../data/events";
+import { initialCultivation } from "./cultivation";
 export const SAVE_PREFIX = "jianghu.v1.";
 export type SaveRecord = { version: 1; savedAt: string; state: GameState };
 function isObject(v: unknown): v is Record<string, unknown> {
@@ -22,6 +23,28 @@ export function validState(v: unknown): v is GameState {
     !isObject(v.relationships)
   )
     return false;
+  if (
+    v.player.gender !== undefined &&
+    !["male", "female"].includes(String(v.player.gender))
+  )
+    return false;
+  if (v.cultivation !== undefined) {
+    const c = v.cultivation;
+    if (
+      !isObject(c) ||
+      !["realm", "xp", "total", "insights", "day", "sessions"].every(
+        (k) => typeof c[k] === "number" && Number.isSafeInteger(c[k]),
+      ) ||
+      Number(c.realm) < 0 ||
+      Number(c.realm) > 14 ||
+      Number(c.xp) < 0 ||
+      Number(c.total) < Number(c.xp) ||
+      Number(c.insights) < 0 ||
+      Number(c.day) < -1 ||
+      Number(c.sessions) < 0
+    )
+      return false;
+  }
   const p = v.player,
     q = v.quest;
   if (
@@ -70,8 +93,10 @@ export function validState(v: unknown): v is GameState {
   )
     return false;
   if (
-    !Object.values(v.flags).every((f) =>
-      ["boolean", "string", "number"].includes(typeof f),
+    !Object.values(v.flags).every(
+      (f) =>
+        ["boolean", "string", "number"].includes(typeof f) &&
+        (typeof f !== "number" || Number.isFinite(f)),
     )
   )
     return false;
@@ -156,6 +181,31 @@ export function parseSave(raw: string): SaveRecord {
     !validState(data.state)
   )
     throw new Error("存档格式不兼容或内容损坏。当前进度未被更改。");
+  const s = data.state as GameState;
+  if (!s.player.gender) {
+    s.player.gender = "male";
+    s.flags.appearance_chosen = false;
+  }
+  if (!s.cultivation) {
+    s.cultivation = initialCultivation();
+    const experience = Math.max(0, Number(s.flags.spars) || 0);
+    const insights =
+      events.filter((e) => !!s.flags[e.id]).length +
+      (s.flags.case_completed ? 2 : 0);
+    const credit = Math.floor(
+      Math.min(
+        500,
+        Object.values(s.arts).reduce((a, b) => a + b, 0) +
+          experience * 8 +
+          insights * 18,
+      ),
+    );
+    s.cultivation.xp = credit;
+    s.cultivation.total = credit;
+    s.cultivation.insights = insights;
+    s.flags.prologue_done = true;
+    s.flags.guide_dismissed = true;
+  }
   return data as SaveRecord;
 }
 export function writeSave(key: string, state: GameState) {

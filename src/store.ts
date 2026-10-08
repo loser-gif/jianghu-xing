@@ -22,6 +22,7 @@ export const useGame = create<{
     origin: string,
     talents: string[],
     weapon: string,
+    gender?: "male" | "female",
   ) => void;
   save: (slot: string) => boolean;
   load: (slot: string) => boolean;
@@ -38,8 +39,8 @@ export const useGame = create<{
     }
     set({ game, storageError });
   },
-  start: (name, origin, talents, weapon) => {
-    const game = createCharacter(name, origin, talents, weapon);
+  start: (name, origin, talents, weapon, gender) => {
+    const game = createCharacter(name, origin, talents, weapon, gender);
     let storageError = "";
     try {
       if (get().game.started) writeSave("previous", get().game);

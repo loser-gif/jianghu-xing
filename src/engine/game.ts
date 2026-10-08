@@ -10,11 +10,22 @@ import {
 } from "../data/world";
 import { events } from "../data/events";
 
+import {
+  initialCultivation,
+  realmBonus,
+  breakthroughNeeds,
+  earnCultivation,
+  realms,
+} from "./cultivation";
+import { commissions, commissionStage, introText } from "./sidequests";
+
 export const freshState = (): GameState => ({
   version: 1,
   started: false,
+  cultivation: initialCultivation(),
   player: {
     name: "沈辞",
+    gender: "male",
     origin: "escort",
     talents: [],
     weapon: "剑",
@@ -52,25 +63,29 @@ export const freshState = (): GameState => ({
 const clamp = (n: number, min: number, max: number) =>
   Math.max(min, Math.min(max, n));
 export function derived(s: GameState) {
+  const bonus = realmBonus(s);
   const gear = Object.values(s.equipped)
     .map((id) => items.find((i) => i.id === id))
     .filter(Boolean);
   const set = s.equipped.armor === "robe" && s.equipped.feet === "boots";
   return {
     maxHp:
+      bonus.hp +
       150 +
       s.player.stats.root * 2 +
       (s.player.talents.includes("strong") ? 40 : 0) +
       gear.reduce((n, g) => n + (g?.hp || 0), 0) +
       (set ? 30 : 0),
-    maxQi: 60 + s.player.stats.spirit,
+    maxQi: bonus.qi + 60 + s.player.stats.spirit,
     attack:
+      bonus.attack +
       10 +
       Math.floor(s.player.stats.root / 5) +
       gear.reduce((n, g) => n + (g?.attack || 0), 0) +
       (s.upgrades[s.equipped.weapon] || 0) * 3 +
       (s.player.talents.includes("fierce") ? 4 : 0),
     defense:
+      bonus.defense +
       5 +
       Math.floor(s.player.stats.root / 12) +
       gear.reduce((n, g) => n + (g?.defense || 0), 0),
@@ -79,6 +94,7 @@ export function derived(s: GameState) {
 }
 export function meets(s: GameState, c: Condition = {}) {
   return (
+    (c.minRealm === undefined || s.cultivation.realm >= c.minRealm) &&
     (!c.flag || !!s.flags[c.flag]) &&
     (!c.notFlag || !s.flags[c.notFlag]) &&
     (!c.minStat || s.player.stats[c.minStat[0]] >= c.minStat[1]) &&
@@ -165,10 +181,13 @@ export function createCharacter(
   originId: string,
   talents: string[],
   weapon: string,
+  gender: "male" | "female" = "male",
 ): GameState {
   const s = freshState(),
     o = origins.find((x) => x.id === originId) || origins[0];
   s.started = true;
+  s.player.gender = gender;
+  s.flags.appearance_chosen = true;
   s.player.name = name.trim().slice(0, 12) || "沈辞";
   s.player.origin = o.id;
   s.player.talents = [...new Set(talents)].slice(0, 2);
@@ -205,6 +224,10 @@ export function createCharacter(
   return s;
 }
 export type Action =
+  | { type: "meditate" | "ascend" | "skipGuide" }
+  | { type: "appearance"; gender: "male" | "female" }
+  | { type: "prologue"; id: "help" | "seek" | "skip" }
+  | { type: "commission"; id: string; choice?: "honest" | "reward" }
   | { type: "move"; id: string }
   | { type: "explore" }
   | { type: "choice"; id: string }
@@ -255,6 +278,141 @@ export function transition(current: GameState, action: Action): GameState {
     return s;
   }
   switch (action.type) {
+    case "appearance":
+      s.player.gender = action.gender;
+      s.flags.appearance_chosen = true;
+      note(s, "人物画像已更新，你的江湖经历悉数保留。");
+      break;
+    case "skipGuide":
+      s.flags.guide_dismissed = true;
+      break;
+    case "prologue": {
+      if (s.flags.prologue_done) break;
+      s.flags.prologue_done = true;
+      if (action.id !== "skip") {
+        s.flags.prologue_choice = action.id;
+        earnCultivation(s, 10);
+        if (action.id === "help") {
+          s.player.morality++;
+          relation(s, "baizhi", 2, 2);
+        } else {
+          relation(
+            s,
+            s.player.origin === "escort" ? "shao" : "swordsman",
+            2,
+            2,
+          );
+        }
+      }
+      note(
+        s,
+        action.id === "skip"
+          ? "你收起来时旧事，独自行入杭州。"
+          : introText(s.player.origin) + " 初心已记，修为 +10。",
+      );
+      break;
+    }
+    case "meditate": {
+      const amount = earnCultivation(s, 12, true);
+      s.player.qi = Math.min(derived(s).maxQi, s.player.qi + 15);
+      note(
+        s,
+        `凝神吐纳，修为 +${amount}，内力恢复 15。同日反复基础修行收益递减。`,
+      );
+      advance(s);
+      break;
+    }
+    case "ascend": {
+      const b = breakthroughNeeds(s);
+      if (!b.ready) {
+        note(
+          s,
+          b.next
+            ? "破境尚欠：" +
+                b.needs
+                  .filter((x) => !x.met)
+                  .map((x) => x.label)
+                  .join("、")
+            : "太朴归真，境界已臻圆满。",
+        );
+        break;
+      }
+      s.cultivation.xp -= b.cost;
+      s.cultivation.realm++;
+      s.player.hp = Math.min(derived(s).maxHp, s.player.hp + 18);
+      s.player.qi = Math.min(derived(s).maxQi, s.player.qi + 8);
+      note(
+        s,
+        `气息贯通，晋入${realms[s.cultivation.realm]}。气血上限 +18，内力上限 +8，外功 +3，防御 +2。`,
+      );
+      advance(s);
+      break;
+    }
+    case "commission": {
+      const q = commissions.find((x) => x.id === action.id);
+      if (!q) break;
+      const step = commissionStage(s, q.id);
+      if (step >= 3 || s.location !== q.locations[step]) break;
+      if (step === 0) {
+        s.flags[`side_${q.id}`] = 1;
+        relation(s, q.npc, 1, 1);
+        note(s, q.story);
+      } else if (step === 1) {
+        s.flags[`side_${q.id}`] = 2;
+        if (q.id === "herb") add(s, "herb", 3);
+        note(
+          s,
+          q.id === "herb"
+            ? "循药谱辨认叶脉，采得药草 ×3。留下根茎，来年仍可生长。"
+            : q.id === "inn"
+              ? "船工躲在码头避雨，托你带回平安话。他还提起一道绯影曾向东而去。"
+              : "镖记藏在砖缝。划痕是旧镖局的暗号，旁边还有通向码头的足印。",
+        );
+      } else {
+        if (q.id === "herb" && (s.inventory.herb || 0) < 3) {
+          note(s, "交付需要药草 ×3，可在药庐购回短缺药材。");
+          break;
+        }
+        if (action.choice !== "honest" && action.choice !== "reward") break;
+        const honest = action.choice === "honest";
+        s.flags[`side_${q.id}`] = 3;
+        s.flags[`side_${q.id}_choice`] = action.choice;
+        relation(s, q.npc, honest ? 10 : 4, honest ? 12 : 4);
+        s.cultivation.insights++;
+        const amount = earnCultivation(
+          s,
+          q.id === "inn" ? 45 : q.id === "herb" ? 50 : 60,
+        );
+        if (q.id === "inn") {
+          s.player.silver += 40;
+          s.flags.trusted_clue = true;
+        }
+        if (q.id === "herb") {
+          add(s, "herb", -3);
+          add(s, "medicine", 2);
+          s.flags.helped_baizhi = true;
+        }
+        if (q.id === "escort") {
+          add(s, "iron", 3);
+          s.flags.trusted_clue = true;
+        }
+        if (!honest) s.player.silver += 20;
+        else s.player.morality += 2;
+        remember(
+          s,
+          q.npc,
+          honest
+            ? `你在「${q.title}」中看重情义，未取额外酬银`
+            : `你办妥「${q.title}」，按约收下额外酬银`,
+        );
+        note(
+          s,
+          `「${q.title}」已了结。${q.reward}。${honest ? "你珍重这份相逢，善恶 +2，信任 +12。" : "额外酬银 +20，信任 +4。"}修为实得 ${amount}，江湖感悟 +1。`,
+        );
+      }
+      advance(s);
+      break;
+    }
     case "move": {
       const l = locations.find((x) => x.id === action.id);
       if (!l || l.id === s.location) break;
@@ -293,6 +451,12 @@ export function transition(current: GameState, action: Action): GameState {
       const event = events.find((e) => e.id === s.activeEvent);
       const c = event?.choices.find((c) => c.id === action.id);
       if (!event || !c || !meets(s, c.requirements)) break;
+      const firstEncounter = !s.flags[event.id];
+      if (firstEncounter) {
+        earnCultivation(s, 18);
+        s.cultivation.insights++;
+      }
+      s.flags.guide_explore = true;
       c.effects.forEach((e) => applyEffect(s, e));
       s.flags[event.id] = true;
       s.activeEvent = c.nextEvent || null;
@@ -305,7 +469,7 @@ export function transition(current: GameState, action: Action): GameState {
               ? "记得你曾以虚言欺骗醉客"
               : c.result,
           );
-      note(s, c.result);
+      note(s, c.result + (firstEncounter ? " 修为 +18，江湖感悟 +1。" : ""));
       advance(s);
       break;
     }
@@ -320,6 +484,7 @@ export function transition(current: GameState, action: Action): GameState {
         note(s, "这里只剩旧日的足迹。先循案卷中的线索找到她。");
         break;
       }
+      s.flags.guide_talk = true;
       relation(s, n.id, 0, 0);
       const key = `talk_${n.id}_${Math.floor(s.time / 6)}`;
       if (!s.flags[key]) {
@@ -398,6 +563,7 @@ export function transition(current: GameState, action: Action): GameState {
       const item = items.find((i) => i.id === action.id);
       if (!item?.slot || !(s.inventory[item.id] > 0)) break;
       s.equipped[item.slot] = item.id;
+      s.flags.guide_equip = true;
       s.player.hp = Math.min(s.player.hp, derived(s).maxHp);
       note(s, `已装备${item.name}，人物属性随之变化。`);
       break;
@@ -480,12 +646,18 @@ export function transition(current: GameState, action: Action): GameState {
     case "practice": {
       if (!s.arts[action.id]) break;
       const amount = s.player.talents.includes("bright") ? 12 : 10;
+      s.flags.guide_practice = true;
+      const gained = earnCultivation(
+        s,
+        action.id === "innerArt" ? 16 : 8,
+        true,
+      );
       s.arts[action.id] = Math.min(100, s.arts[action.id] + amount);
       if (action.id === "innerArt")
         s.player.qi = Math.min(derived(s).maxQi, s.player.qi + 20);
       note(
         s,
-        `静心修习《${arts.find((a) => a.id === action.id)?.name}》，熟练度 +${amount}。`,
+        `静心修习《${arts.find((a) => a.id === action.id)?.name}》，熟练度 +${amount}，修为 +${gained}。`,
       );
       advance(s);
       break;
@@ -572,6 +744,7 @@ export function transition(current: GameState, action: Action): GameState {
     case "track": {
       if (stage !== "trail" || s.location !== "alley") break;
       const reliable =
+        s.cultivation.realm >= 2 ||
         s.player.origin === "hunter" ||
         s.player.talents.includes("careful") ||
         s.flags.trusted_clue ||
@@ -695,12 +868,16 @@ export function transition(current: GameState, action: Action): GameState {
       }
       c.hp = Math.max(0, c.hp - damage);
       if (c.hp === 0) {
+        const firstWin = !s.flags.gu_defeated;
+        if (firstWin) earnCultivation(s, 40);
+        s.flags.gu_defeated = true;
+        s.flags.guide_spar = true;
         s.flags.spars = Number(s.flags.spars || 0) + 1;
         s.quest.stage = "defeated";
         s.combat = null;
         note(
           s,
-          "顾红绫的兵刃落地，已完全失去战力。你收住攻势，接下来由你决定如何处置。",
+          `顾红绫的兵刃落地，已完全失去战力。${firstWin ? "初次实战获胜，修为 +40。" : ""}你收住攻势，接下来由你决定如何处置。`,
         );
         break;
       }
@@ -791,6 +968,10 @@ export function transition(current: GameState, action: Action): GameState {
       s.identity.reputation += 25;
       s.identity.contribution += 40;
       s.identity.wins++;
+      if (!s.flags.case_completed) {
+        earnCultivation(s, 150);
+        s.cultivation.insights += 2;
+      }
       s.flags.case_completed = true;
       relation(s, "lu", 12, 15);
       relation(s, "suwan", 5, 5);
@@ -798,7 +979,7 @@ export function transition(current: GameState, action: Action): GameState {
       remember(s, "suwan", "你让烟雨楼失窃案有了交代");
       note(
         s,
-        "烟雨楼盗案 · 结案。赏银 +300 两，捕快声望 +25，官府贡献 +40。街巷重新安宁，你可以向陆捕头申请晋升。",
+        "烟雨楼盗案 · 结案。赏银 +300 两，捕快声望 +25，官府贡献 +40；初次结案另获修为 150、感悟 2。街巷重新安宁，你可以向陆捕头申请晋升。",
       );
       break;
     }
@@ -874,11 +1055,16 @@ export function transition(current: GameState, action: Action): GameState {
         note(s, "伤势未愈，先去疗伤吧。");
         break;
       }
+      const gained = earnCultivation(s, 20, true);
+      s.flags.guide_spar = true;
       s.player.hp -= 20;
       s.flags.spars = Number(s.flags.spars || 0) + 1;
       s.player.stats.insight = Math.min(90, s.player.stats.insight + 2);
       relation(s, "swordsman", 2, 2);
-      note(s, "与剑客切磋一式，气血 −20，悟性 +2，交手经历 +1。");
+      note(
+        s,
+        `与剑客切磋一式，气血 −20，悟性 +2，交手经历 +1，修为 +${gained}。`,
+      );
       advance(s);
       break;
     }

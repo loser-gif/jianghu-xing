@@ -38,7 +38,7 @@ export function Relations({
           ))}
         </svg>
         <div className="bond-self">
-          <Portrait id="player" />
+          <Portrait id="player" gender={s.player.gender} />
           <b>{s.player.name}</b>
           <span>你的江湖</span>
         </div>

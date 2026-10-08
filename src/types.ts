@@ -1,3 +1,4 @@
+import type { Cultivation } from "./engine/cultivation";
 export type Stats = {
   root: number;
   insight: number;
@@ -25,7 +26,9 @@ export type Relation = {
 export type GameState = {
   version: 1;
   started: boolean;
+  cultivation: Cultivation;
   player: {
+    gender: "male" | "female";
     name: string;
     origin: string;
     talents: string[];
@@ -72,6 +75,7 @@ export type GameState = {
   lastMessage: string;
 };
 export type Condition = {
+  minRealm?: number;
   flag?: string;
   notFlag?: string;
   minStat?: [keyof Stats, number];

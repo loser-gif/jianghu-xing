@@ -12,6 +12,7 @@ sources = ["art/menu/mountain-moon.png"]
 sources += [f"art/menu/{name}.png" for name in ["mountain-background", "swordsman-wind"]]
 sources += [f"reference/figure-{n}.jpg" for n in [8, 9, 10, 15, 18]]
 sources += [f"art/equipment/{name}.png" for name in ["sword", "saber", "robe", "boots", "oldSword"]]
+sources += [f"art/player/{name}.png" for name in ["male", "female"]]
 manifest = {}
 for source in sources:
     image = Image.open(public / source)

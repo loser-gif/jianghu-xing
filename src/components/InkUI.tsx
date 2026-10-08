@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { PlayerPortrait } from "./PlayerPortrait";
+import { npcRealms } from "../engine/cultivation";
 import { artUrl } from "../artAssets";
 import type { ReactNode } from "react";
 import {
@@ -91,11 +93,17 @@ export function Portrait({
   id,
   className = "",
   list = false,
+  gender = "male",
 }: {
   id: string;
   className?: string;
   list?: boolean;
+  gender?: "male" | "female";
 }) {
+  if (id === "player")
+    return (
+      <PlayerPortrait gender={gender} className={`portrait-art ${className}`} />
+    );
   const [figure, rect] = portraits[id];
   return (
     <Art
@@ -304,7 +312,9 @@ export function People({
                 {n.name}
                 <span className="gender">{n.gender}</span>
               </h2>
-              <p>{n.role}</p>
+              <p>
+                {n.role} · {npcRealms[n.id]}
+              </p>
               <div className="tags">
                 {n.tags.slice(0, 2).map((t) => (
                   <span key={t}>{t}</span>
@@ -380,12 +390,15 @@ export function Detail({
       </button>
       <section className="profile-hero">
         <Portrait id={n.id} />
+
         <div>
           <div className="profile-name">
             <h2>{n.name}</h2>
             <span className="gender">{n.gender}</span>
           </div>
-          <p>{n.role}</p>
+          <p>
+            {n.role} · {npcRealms[n.id]}
+          </p>
           <blockquote>“{n.quote}”</blockquote>
           <span className="place">
             <MapPin />
@@ -686,14 +699,20 @@ export function Equipment({
             </span>
           </h2>
           <p>器甲在身，行走更稳</p>
+          {!s.flags.guide_equip && (
+            <button
+              className="text-button"
+              onClick={() => act({ type: "equip", id: s.equipped.weapon })}
+            >
+              检查行装 · 确认随身兵器
+            </button>
+          )}
         </div>
         <div className="loadout-scene">
-          <Art
-            figure={15}
-            rect={[266, 279, 250, 603]}
+          <PlayerPortrait
+            gender={s.player.gender}
+            full
             className="loadout-figure"
-            label="随身器甲人物立绘"
-            fit="xMidYMid meet"
           />
           <div className="loadout">
             {[

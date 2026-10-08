@@ -1,3 +1,4 @@
+import { PlayerPortrait } from "./PlayerPortrait";
 import { useEffect, useRef } from "react";
 import { ReferenceHeader, ReferencePortrait } from "./Reference";
 import type { ReactNode } from "react";
@@ -110,14 +111,22 @@ export function Icon({
   return <C size={size} strokeWidth={1.45} aria-hidden="true" {...props} />;
 }
 export function Portrait({
+  gender = "male",
   index = 6,
   size = "medium",
   className = "",
 }: {
+  gender?: "male" | "female";
   index?: number;
   size?: string;
   className?: string;
 }) {
+  if (index === 6)
+    return (
+      <div className={`portrait ${size} ${className}`}>
+        <PlayerPortrait gender={gender} full={size === "hero"} />
+      </div>
+    );
   return <ReferencePortrait index={index} size={size} className={className} />;
 }
 export function Seal({ children }: { children: ReactNode }) {

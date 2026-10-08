@@ -22,7 +22,7 @@ export function Inventory({
   return (
     <>
       <div className="inventory-summary">
-        <Portrait size="small" />
+        <Portrait gender={s.player.gender} size="small" />
         <div>
           <b>{s.player.name}的行囊</b>
           <p>行走江湖，轻装亦有底气。</p>

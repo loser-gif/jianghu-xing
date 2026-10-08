@@ -50,5 +50,13 @@
   "art/equipment/oldSword.png": {
     "file": "art/optimized/oldSword.f71603cb1191.webp",
     "bytes": 106804
+  },
+  "art/player/male.png": {
+    "file": "art/optimized/male.e1cba6b3e1cd.webp",
+    "bytes": 424568
+  },
+  "art/player/female.png": {
+    "file": "art/optimized/female.9d1e66aca043.webp",
+    "bytes": 438334
   }
 }

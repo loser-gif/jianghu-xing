@@ -1,3 +1,4 @@
+import { realms } from "../engine/cultivation";
 import { useGame } from "../store";
 import { arts } from "../data/world";
 import { Icon, Portrait, Button, Meter, Modal } from "../components/UI";
@@ -6,17 +7,19 @@ import { derived } from "../engine/game";
 import { useEffect, useRef, useState } from "react";
 
 function CombatPortrait({
+  gender,
   index = 6,
   delta = 0,
   round,
 }: {
+  gender?: "male" | "female";
   index?: number;
   delta?: number;
   round: number;
 }) {
   return (
     <div className="combat-portrait">
-      <Portrait index={index} />
+      <Portrait index={index} gender={gender} />
       {delta !== 0 && (
         <div
           key={round}
@@ -65,10 +68,13 @@ export function Combat({ s }: { s: GameState }) {
       <div className="combatants">
         <div>
           <CombatPortrait
+            gender={s.player.gender}
             delta={pulse?.player}
             round={pulse?.round ?? c.round}
           />
-          <h3>{s.player.name}</h3>
+          <h3>
+            {s.player.name} · {realms[s.cultivation.realm]}
+          </h3>
           <Meter label="气血" value={s.player.hp} max={d.maxHp} color="red" />
           <Meter label="内力" value={s.player.qi} max={d.maxQi} />
         </div>
@@ -81,11 +87,16 @@ export function Combat({ s }: { s: GameState }) {
             delta={pulse?.enemy}
             round={pulse?.round ?? c.round}
           />
-          <h3>顾红绫</h3>
+          <h3>顾红绫 · 八品</h3>
           <Meter label="气血" value={c.hp} max={c.maxHp} color="red" />
           <p className="small muted">身轻如燕 · 每三回合使出燕返</p>
         </div>
       </div>
+      <p className="combat-intent">
+        {c.round % 3 === 0
+          ? "敌方意图：燕返重击（基础 44）· 宜防守或轻功闪避"
+          : "敌方意图：试探进攻（基础 32）· 防御会抵消部分伤害"}
+      </p>
       <div className="combat-log" aria-live="polite">
         {c.logs.slice(0, 5).map((l, i) => (
           <p key={`${c.round}-${i}`} className={i === 0 ? "latest" : ""}>

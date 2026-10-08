@@ -1,3 +1,4 @@
+import { CommissionBoard } from "../components/Progression";
 import { useGame } from "../store";
 import { locations, items, stageLabels, questSteps } from "../data/world";
 import {
@@ -37,6 +38,7 @@ export function Quest({
   };
   return (
     <>
+      <CommissionBoard s={s} navigate={navigate} />
       <div className="case-heading">
         <div>
           <span className="eyebrow">杭州官府 · 缉捕案卷 · 壹</span>
