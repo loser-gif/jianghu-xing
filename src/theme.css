@@ -5399,3 +5399,732 @@ dialog::backdrop {
     height: 230px;
   }
 }
+
+/* Desktop uses a persistent desk-side index and independent content columns. */
+.desktop-sidebar {
+  display: none;
+}
+@media (min-width: 1100px) {
+  .game-layout {
+    max-width: 1680px;
+    padding: 20px 28px;
+  }
+  .game-layout.playing-layout {
+    display: grid;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .game-paper {
+    min-height: calc(100dvh - 40px);
+  }
+  .desktop-sidebar {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    background: #ede9dc;
+    border: 1px solid #b8b39f;
+    box-shadow: 0 8px 30px #303b2810;
+    padding: 24px 16px 16px;
+    scrollbar-width: thin;
+  }
+  .desktop-brand {
+    text-align: left;
+    font:
+      40px DocumentBrush,
+      serif;
+    letter-spacing: 3px;
+    padding: 0 7px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .desktop-brand span {
+    display: block;
+    font:
+      12px/1.8 "SimSun",
+      serif;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    color: var(--muted);
+  }
+  .desktop-player {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 17px 0 10px;
+  }
+  .desktop-player .player-art {
+    width: 48px;
+    height: 55px;
+    flex-shrink: 0;
+  }
+  .desktop-player b {
+    display: block;
+    font:
+      20px "SimSun",
+      serif;
+  }
+  .desktop-player span {
+    display: block;
+    font-size: 12px;
+    margin-top: 7px;
+    color: var(--muted);
+  }
+  .desktop-vitals {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--line);
+  }
+  .desktop-sidebar nav {
+    display: grid;
+    gap: 4px;
+    padding: 15px 0;
+  }
+  .desktop-sidebar nav button {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 43px;
+    padding: 9px 12px;
+    text-align: left;
+    border: 1px solid transparent;
+    font-size: 15px;
+  }
+  .desktop-sidebar nav button:hover {
+    background: #9eaa8d1a;
+    border-color: #b5b7a1;
+  }
+  .desktop-sidebar nav button[aria-current] {
+    background: #3a4438;
+    color: #f6eed9;
+    border-color: #8c957a;
+    box-shadow: inset 3px 0 #bfa77a;
+  }
+  .desktop-tools {
+    display: grid;
+    gap: 5px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+  .desktop-tools button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+  .desktop-colophon {
+    font:
+      12px "SimSun",
+      serif;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #888774;
+    margin-top: 20px;
+  }
+  .playing-layout .bottom-nav,
+  .playing-layout .utility-nav {
+    display: none;
+  }
+  .playing-layout .page-content {
+    padding: 0 32px 12px;
+  }
+  .playing-layout .game-topbar {
+    padding: 9px 32px;
+  }
+  .playing-layout .heading-copy {
+    padding: 22px 32px 24px;
+    max-width: 650px;
+  }
+  .playing-layout .heading-title h1 {
+    font-size: 48px;
+  }
+  .playing-layout .heading-poem {
+    display: none;
+  }
+  .playing-layout .landscape {
+    width: 380px;
+    height: 155px;
+    right: 24px;
+  }
+  .playing-layout .heading-inscription {
+    display: none;
+  }
+  .playing-layout .paper-ending {
+    padding-top: 10px;
+    padding-bottom: 20px;
+  }
+  .playing-layout .save-indicator {
+    grid-column: 1/-1;
+    margin-top: 24px;
+  }
+  .journey-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(310px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .journey-landscape {
+    position: sticky;
+    top: 24px;
+  }
+  .journey-landscape .scene {
+    height: 390px;
+  }
+  .journey-landscape .scene-prose {
+    padding: 24px 12px;
+  }
+  .journey-activities .section:first-child {
+    margin-top: 0;
+  }
+  .journey-activities .section {
+    margin-bottom: 24px;
+  }
+  .journey-activities .nearby-list > button {
+    gap: 10px;
+  }
+  .journey-activities .nearby-list .portrait {
+    width: 64px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+  .arrival-guide {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 20px;
+  }
+  .arrival-guide p {
+    font-size: 14px;
+  }
+  .arrival-guide .progression-buttons {
+    flex-shrink: 0;
+  }
+  .content-inventory {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 20px 26px;
+    align-items: start;
+  }
+  .content-inventory > .search-row,
+  .content-inventory > .tabs,
+  .content-inventory > .empty {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+  .content-inventory .equipment-summary {
+    grid-column: 1;
+    position: sticky;
+    top: 24px;
+    margin: 0;
+  }
+  .content-inventory .equipment-list {
+    grid-column: 2;
+    gap: 12px;
+  }
+  .content-inventory .loadout-scene {
+    grid-template-columns: 1fr;
+    padding: 0 14px;
+    gap: 12px;
+  }
+  .content-inventory .loadout-figure {
+    height: 270px;
+    width: 180px;
+  }
+  .content-inventory .loadout-heading {
+    padding: 18px;
+  }
+  .content-inventory .summary-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 20px;
+    gap: 8px;
+  }
+  .content-inventory .equipment-row {
+    min-height: 112px;
+  }
+  .content-inventory .item-art-frame {
+    width: 100px;
+    height: 112px;
+  }
+  .content-inventory .item-open {
+    gap: 12px;
+  }
+  .content-inventory .equipment-row h2 {
+    font-size: 22px;
+  }
+  .content-inventory .equipment-action {
+    gap: 4px;
+  }
+  .content-inventory .equip-button {
+    padding: 8px 10px;
+    min-width: 80px;
+  }
+  .content-character {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+  .content-character .character-hero {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+  }
+  .content-character .appearance-options {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+  }
+  .content-character .cultivation-panel {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+  .content-character > .section {
+    margin: 0;
+  }
+  .content-character > .destination-list {
+    align-self: stretch;
+  }
+  .content-map {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 20px;
+    align-items: start;
+  }
+  .content-map .map-region-bar {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+  .content-map .world-map {
+    height: 560px;
+    grid-column: 1;
+  }
+  .content-map .map-detail {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+    padding: 24px;
+    position: sticky;
+    top: 24px;
+    min-height: 280px;
+  }
+  .content-map .map-detail > div {
+    flex: none;
+  }
+  .content-map .map-detail .button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .content-map .future-regions {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+  .content-quest .commission-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .content-quest .commission-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px;
+  }
+  .content-quest .commission-card .button {
+    font-size: 14px;
+  }
+  .content-arts .arts-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .content-arts .art-card {
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+  .content-arts .book-cover {
+    width: 76px;
+    height: 194px;
+    min-height: 0;
+    padding: 12px 7px 10px 19px;
+    margin: 6px 4px;
+  }
+  .content-arts .book-cover > span {
+    font-size: 20px;
+    min-height: 142px;
+    padding: 7px 3px;
+  }
+  .content-arts .art-buttons {
+    flex-wrap: wrap;
+  }
+  .content-arts .art-buttons .button {
+    padding: 8px 11px;
+    font-size: 14px;
+  }
+  .content-arts .cultivation-panel {
+    margin-top: 0;
+  }
+  .creation-layout-shell {
+    max-width: 1400px;
+  }
+  .creation-layout-shell .page-content {
+    padding: 0 48px;
+  }
+  .creation-layout-shell .creation-v2 .creation-layout {
+    grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+    gap: 56px;
+  }
+  .creation-layout-shell .creation-art .player-art {
+    height: 560px;
+  }
+  .creation-layout-shell .page-heading .heading-copy {
+    padding-top: 24px;
+    padding-bottom: 18px;
+  }
+  .creation-layout-shell .heading-poem {
+    display: none;
+  }
+  .game-dialog {
+    max-height: calc(100dvh - 64px);
+  }
+  .game-dialog.wide {
+    width: min(1000px, 90vw);
+    max-width: 1000px;
+  }
+  .toast {
+    left: auto;
+    right: 40px;
+    bottom: 30px;
+    transform: none;
+    max-width: 500px;
+  }
+  /* The original portrait painting retains its proportions beside a paper menu. */
+  .game-layout.opening-layout {
+    max-width: 1440px;
+    padding: 20px 28px;
+  }
+  .opening-menu {
+    --desk-height: clamp(640px, calc(100svh - 40px), 1000px);
+    height: var(--desk-height);
+    min-height: 0;
+    max-height: none;
+    background: #e6e4d5;
+  }
+  .opening-painting,
+  .opening-live-painting {
+    width: min(55%, calc(var(--desk-height) * 0.78));
+    right: auto;
+    mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+  .opening-wash {
+    background: linear-gradient(
+      90deg,
+      transparent 32%,
+      #e6e4d535 44%,
+      #e6e4d5 58%
+    );
+  }
+  .opening-atmosphere {
+    width: min(55%, calc(var(--desk-height) * 0.78));
+    mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+  .opening-heading {
+    left: 57%;
+    top: 12%;
+    gap: 18px;
+  }
+  .game-paper.opening-paper .opening-heading h1 {
+    flex-direction: row;
+    font-size: 82px;
+    line-height: 1.1;
+    letter-spacing: 6px;
+  }
+  .opening-heading h1 span:nth-child(n) {
+    transform: none;
+  }
+  .opening-seal {
+    margin: 0;
+    font-size: 14px;
+    align-self: center;
+  }
+  .opening-verse {
+    left: 57%;
+    top: 29%;
+    flex-direction: row;
+    gap: 22px;
+    font-size: 17px;
+  }
+  .opening-verse span {
+    writing-mode: horizontal-tb;
+    letter-spacing: 2px;
+  }
+  .opening-verse:before {
+    display: none;
+  }
+  .opening-actions {
+    left: 57%;
+    right: 6%;
+    width: auto;
+    bottom: 16%;
+    gap: 12px;
+    color: var(--ink);
+  }
+  .opening-actions:before {
+    display: none;
+  }
+  .opening-chapter {
+    background: none;
+    color: #73765e;
+    text-shadow: none;
+    padding: 0 0 8px;
+  }
+  .opening-action {
+    color: #354032;
+    text-shadow: none;
+    font-size: 24px;
+    border-bottom: 1px solid #b6b59e;
+    background: #f7f4e438;
+    min-height: 54px;
+  }
+  .opening-primary {
+    background: #38483c;
+    color: #f5edd7;
+    min-height: 76px;
+  }
+  .opening-action small {
+    color: #ddd8c4;
+  }
+  .opening-action:not(.opening-primary):enabled:hover {
+    background: #b6bca13b;
+    color: #2f3d31;
+  }
+  .opening-action:disabled {
+    background: none;
+    color: #939583;
+  }
+  .opening-action:focus-visible {
+    outline-color: #6b704a;
+  }
+  .opening-progress {
+    color: #70745d;
+    text-shadow: none;
+  }
+  .opening-footer {
+    left: 57%;
+    right: 6%;
+    bottom: 6%;
+    color: #6f735b;
+    text-shadow: none;
+  }
+  .opening-motion-control {
+    right: 24px;
+    top: 22px;
+  }
+}
+@media (min-width: 1450px) {
+  .content-npc .people-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .content-npc .person-row {
+    grid-template-columns: 108px minmax(0, 1fr) 16px;
+    gap: 8px 12px;
+    padding: 0 12px 0 0;
+  }
+  .content-npc .person-row > .portrait-art {
+    grid-row: 1 / span 2;
+    height: 180px;
+  }
+  .content-npc .person-main {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    padding-top: 12px;
+  }
+  .content-npc .person-meta {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    padding-bottom: 12px;
+  }
+  .content-npc .person-row > svg:last-child {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
+@media (min-width: 1100px) and (max-width: 1250px) {
+  .game-layout.playing-layout {
+    grid-template-columns: 186px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+  .playing-layout .page-content {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  .desktop-sidebar {
+    padding: 18px 12px;
+  }
+  .journey-columns {
+    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
+  }
+  .content-inventory {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .content-inventory .item-art-frame {
+    width: 78px;
+  }
+  .content-inventory .equipment-row h2 {
+    font-size: 20px;
+  }
+  .content-arts .arts-list {
+    grid-template-columns: 1fr;
+  }
+  .content-map {
+    grid-template-columns: minmax(0, 1fr) 220px;
+  }
+  .content-character {
+    grid-template-columns: 1fr;
+  }
+  .content-character .cultivation-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+/* Resolve legacy mobile illustration sizing and keep the desktop first screen useful. */
+.player-art > svg.player-static {
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 1100px) {
+  .playing-layout .page-heading {
+    height: 155px;
+  }
+  .playing-layout .journey-status {
+    display: none;
+  }
+  .playing-layout .arrival-guide {
+    margin-top: 0;
+  }
+  .content-inventory .equipment-summary.illustrated-loadout > .loadout-scene {
+    grid-template-columns: 1fr;
+    padding: 0 14px;
+    gap: 12px;
+  }
+  .content-inventory .equipment-summary.illustrated-loadout .loadout {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .content-inventory .loadout button {
+    min-height: 75px;
+  }
+  .content-inventory .loadout .item-art-frame {
+    width: 76px;
+    height: 74px;
+  }
+  .content-inventory .loadout-figure.player-art {
+    height: 240px;
+  }
+  .content-inventory .collection-foot {
+    grid-column: 1/-1;
+  }
+  .toast {
+    animation-name: desktop-notice;
+  }
+  @keyframes desktop-notice {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+@media (min-width: 1100px) and (max-height: 800px) {
+  .desktop-sidebar {
+    padding-top: 16px;
+  }
+  .desktop-brand {
+    font-size: 32px;
+    padding-bottom: 10px;
+  }
+  .desktop-player {
+    margin-top: 12px;
+  }
+  .desktop-vitals {
+    padding-bottom: 10px;
+  }
+  .desktop-sidebar nav {
+    padding: 10px 0;
+    gap: 2px;
+  }
+  .desktop-sidebar nav button {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+  .desktop-tools {
+    padding-top: 8px;
+    gap: 0;
+  }
+  .desktop-colophon {
+    margin-top: 10px;
+  }
+}
+@media (min-width: 1100px) {
+  .content-arts .cultivation-panel {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr) auto;
+    gap: 10px 22px;
+    align-items: center;
+  }
+  .content-arts .cultivation-heading {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .content-arts .cultivation-heading h2 {
+    margin: 7px 0;
+  }
+  .content-arts .cultivation-panel > .meter {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+  .content-arts .realm-needs {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+  }
+  .content-arts .cultivation-panel > .progression-buttons {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .content-arts .cultivation-panel > p {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+  .content-arts .cultivation-panel > details {
+    grid-column: 1/-1;
+    margin-top: 0;
+  }
+}

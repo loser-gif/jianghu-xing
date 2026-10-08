@@ -1,3 +1,4 @@
+import { DesktopNav } from "./components/DesktopNav";
 import {
   useCallback,
   useEffect,
@@ -92,7 +93,19 @@ export default function App() {
     event
   );
   return (
-    <div className={`game-layout ${screen === "menu" ? "opening-layout" : ""}`}>
+    <div
+      className={`game-layout ${screen === "menu" ? "opening-layout" : screen === "game" ? "playing-layout" : "creation-layout-shell"}`}
+    >
+      {screen === "game" && (
+        <DesktopNav
+          s={s}
+          page={page}
+          navigate={navigate}
+          onSave={() => setSaveOpen(true)}
+          onHelp={() => setHelp(true)}
+          onMenu={() => setScreen("menu")}
+        />
+      )}
       <main
         className={`paper game-paper ${screen === "menu" ? "opening-paper" : ""}`}
         ref={heading}
@@ -147,7 +160,7 @@ export default function App() {
               equipment={page === "inventory"}
             />
             <div
-              className="page-content page-arrival"
+              className={`page-content page-arrival content-${npc ? "detail" : relations ? "relations" : page}`}
               key={`${page}-${npc?.id ?? "list"}-${relations}`}
             >
               {storageError && (
