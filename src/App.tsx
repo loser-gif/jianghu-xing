@@ -63,6 +63,24 @@ export default function App() {
     [relations, setRelations] = useState(false),
     [notice, setNotice] = useState("");
   const heading = useRef<HTMLElement>(null);
+  const positions = useRef<Record<string, number>>({});
+  const viewKey = `${screen}/${page}/${npc?.id ?? "list"}/${relations}/${page === "jianghu" ? s.location : ""}`;
+  const [peopleFilters, setPeopleFilters] = useState({
+    query: "",
+    category: "全部",
+    known: false,
+  });
+  const [equipmentFilters, setEquipmentFilters] = useState({
+    query: "",
+    category: "全部",
+  });
+  const [artFilter, setArtFilter] = useState("全部");
+  const resetBrowsing = () => {
+    positions.current = {};
+    setPeopleFilters({ query: "", category: "全部", known: false });
+    setEquipmentFilters({ query: "", category: "全部" });
+    setArtFilter("全部");
+  };
   const closeSave = useCallback(() => setSaveOpen(false), []),
     closeHelp = useCallback(() => setHelp(false), []);
   const navigate = (p: Page) => {
@@ -73,9 +91,17 @@ export default function App() {
     setNotice("");
   };
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({
+      top: positions.current[viewKey] ?? 0,
+      behavior: "instant",
+    });
     heading.current?.focus({ preventScroll: true });
-  }, [screen, page, npc, relations]);
+    const remember = () => {
+      positions.current[viewKey] = window.scrollY;
+    };
+    window.addEventListener("scroll", remember, { passive: true });
+    return () => window.removeEventListener("scroll", remember);
+  }, [viewKey]);
   useEffect(() => {
     if (s.lastMessage && screen === "game") {
       setNotice(s.lastMessage);
@@ -127,6 +153,7 @@ export default function App() {
               <Creation
                 onBack={() => setScreen("menu")}
                 onDone={() => {
+                  resetBrowsing();
                   navigate("jianghu");
                   setScreen("game");
                 }}
@@ -205,18 +232,37 @@ export default function App() {
                       {relations ? (
                         <Relations s={s} select={setNpc} />
                       ) : (
-                        <People s={s} select={setNpc} />
+                        <People
+                          s={s}
+                          select={setNpc}
+                          filters={peopleFilters}
+                          onFilters={setPeopleFilters}
+                        />
                       )}
                     </>
                   )}
-                  {page === "inventory" && <Equipment s={s} act={act} />}
+                  {page === "inventory" && (
+                    <Equipment
+                      s={s}
+                      act={act}
+                      filters={equipmentFilters}
+                      onFilters={setEquipmentFilters}
+                    />
+                  )}
                   {page === "jianghu" && (
                     <Jianghu s={s} onNpc={setNpc} navigate={navigate} />
                   )}
                   {page === "character" && (
                     <Character s={s} navigate={navigate} onItem={setItem} />
                   )}
-                  {page === "arts" && <Martial s={s} navigate={navigate} />}
+                  {page === "arts" && (
+                    <Martial
+                      s={s}
+                      navigate={navigate}
+                      filter={artFilter}
+                      setFilter={setArtFilter}
+                    />
+                  )}
                   {page === "map" && (
                     <WorldMap
                       s={s}
@@ -292,6 +338,7 @@ export default function App() {
         <SavePanel
           onClose={closeSave}
           onLoaded={() => {
+            resetBrowsing();
             closeSave();
             navigate("jianghu");
             setScreen("game");

@@ -74,6 +74,15 @@ export function Review() {
     [npc, setNpc] = useState(npcs[0]),
     [compare, setCompare] = useState(false);
   const [message, setMessage] = useState("");
+  const [peopleFilters, setPeopleFilters] = useState({
+    query: "",
+    category: "全部",
+    known: false,
+  });
+  const [equipmentFilters, setEquipmentFilters] = useState({
+    query: "",
+    category: "全部",
+  });
   const heading = useRef<HTMLDivElement>(null);
   const act = (a: Action) => {
     const next = transition(s, a);
@@ -146,6 +155,8 @@ export function Review() {
             {page === "people" ? (
               <People
                 s={s}
+                filters={peopleFilters}
+                onFilters={setPeopleFilters}
                 select={(n) => {
                   setNpc(n);
                   navigate("detail");
@@ -160,7 +171,12 @@ export function Review() {
                 back={() => navigate("people")}
               />
             ) : (
-              <Equipment s={s} act={act} />
+              <Equipment
+                s={s}
+                act={act}
+                filters={equipmentFilters}
+                onFilters={setEquipmentFilters}
+              />
             )}
           </div>
           <PaperEnding />

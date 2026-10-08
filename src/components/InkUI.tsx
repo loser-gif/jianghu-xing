@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
+import { useDialog } from "./useDialog";
 import { PlayerPortrait } from "./PlayerPortrait";
 import { npcRealms } from "../engine/cultivation";
 import { artUrl } from "../artAssets";
@@ -186,7 +187,28 @@ export function Tabs({
   label: string;
 }) {
   return (
-    <div className="tabs" role="group" aria-label={label}>
+    <div
+      className="tabs"
+      role="group"
+      aria-label={label}
+      onKeyDown={(event) => {
+        const buttons = Array.from(
+          event.currentTarget.querySelectorAll("button"),
+        );
+        const index = buttons.indexOf(event.target as HTMLButtonElement);
+        if (index < 0) return;
+        let next: number;
+        if (event.key === "ArrowRight") next = (index + 1) % options.length;
+        else if (event.key === "ArrowLeft")
+          next = (index + options.length - 1) % options.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = options.length - 1;
+        else return;
+        event.preventDefault();
+        onChange(options[next]);
+        buttons[next].focus({ preventScroll: true });
+      }}
+    >
       {options.map((v) => (
         <button key={v} aria-pressed={value === v} onClick={() => onChange(v)}>
           {v}
@@ -251,13 +273,22 @@ export function Meter({
 export function People({
   s,
   select,
+  filters,
+  onFilters,
 }: {
   s: GameState;
   select: (n: NPC) => void;
+  filters: { query: string; category: string; known: boolean };
+  onFilters: (filters: {
+    query: string;
+    category: string;
+    known: boolean;
+  }) => void;
 }) {
-  const [query, setQuery] = useState(""),
-    [category, setCategory] = useState("全部"),
-    [known, setKnown] = useState(false);
+  const { query, category, known } = filters;
+  const setQuery = (query: string) => onFilters({ ...filters, query });
+  const setCategory = (category: string) => onFilters({ ...filters, category });
+  const setKnown = (known: boolean) => onFilters({ ...filters, known });
   const list = npcs.filter(
     (n) =>
       (!known || s.relationships[n.id].met) &&
@@ -634,13 +665,18 @@ export function ItemStats({ item, level }: { item: Item; level: number }) {
 export function Equipment({
   s,
   act,
+  filters,
+  onFilters,
 }: {
   s: GameState;
   act: (a: Action) => void;
+  filters: { query: string; category: string };
+  onFilters: (filters: { query: string; category: string }) => void;
 }) {
-  const [filter, setFilter] = useState("全部"),
-    [query, setQuery] = useState(""),
-    [selected, setSelected] = useState<Item | null>(null);
+  const { query, category: filter } = filters;
+  const setQuery = (query: string) => onFilters({ ...filters, query });
+  const setFilter = (category: string) => onFilters({ ...filters, category });
+  const [selected, setSelected] = useState<Item | null>(null);
   const own = items
     .filter(
       (i) =>
@@ -733,8 +769,10 @@ export function Equipment({
                   onClick={() => {
                     if (equipped) setSelected(equipped);
                     else {
-                      setFilter(slot === "weapon" ? "兵器" : "护甲");
-                      setQuery("");
+                      onFilters({
+                        category: slot === "weapon" ? "兵器" : "护甲",
+                        query: "",
+                      });
                     }
                   }}
                 >
@@ -845,8 +883,7 @@ export function Equipment({
           <button
             className="outline-button"
             onClick={() => {
-              setQuery("");
-              setFilter("全部");
+              onFilters({ query: "", category: "全部" });
             }}
           >
             查看全部物品
@@ -886,34 +923,30 @@ export function ItemDialog({
   };
   const preview = equipmentPreview(s, item);
   const owned = s.inventory[item.id] || 0;
-  const ref = useRef<HTMLDialogElement>(null),
-    level = s.upgrades[item.id] || 0,
+  const { ref, closing, dismiss } = useDialog(close);
+  const level = s.upgrades[item.id] || 0,
     cost = 20 + level * 15;
-  useEffect(() => {
-    const dialog = ref.current!;
-    const previous = document.activeElement as HTMLElement;
-    dialog.showModal();
-    const old = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      dialog.close();
-      document.body.style.overflow = old;
-      previous?.focus();
-    };
-  }, []);
   return (
     <dialog
       ref={ref}
-      onCancel={close}
+      className={`item-dialog ${closing ? "dialog-closing" : ""}`}
+      onCancel={(event) => {
+        event.preventDefault();
+        dismiss();
+      }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) close();
+        if (e.target === e.currentTarget) dismiss();
       }}
       aria-label={`${item.name}详情`}
     >
       <div className="dialog-content">
         <div className="dialog-top">
           <span>器物详情</span>
-          <button className="icon-button" onClick={close} aria-label="关闭详情">
+          <button
+            className="icon-button"
+            onClick={dismiss}
+            aria-label="关闭详情"
+          >
             <X />
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { PlayerPortrait } from "./PlayerPortrait";
-import { useEffect, useRef } from "react";
+import { useDialog } from "./useDialog";
 import { ReferenceHeader, ReferencePortrait } from "./Reference";
 import type { ReactNode } from "react";
 import {
@@ -255,37 +255,25 @@ export function Modal({
   onClose?: () => void;
   wide?: boolean;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current!;
-    const previous = document.activeElement as HTMLElement;
-    const old = document.body.style.overflow;
-    dialog.showModal();
-    document.body.style.overflow = "hidden";
-    return () => {
-      dialog.close();
-      document.body.style.overflow = old;
-      previous?.focus();
-    };
-  }, []);
+  const { ref, closing, dismiss } = useDialog(onClose);
   return (
     <dialog
-      className={`game-dialog ${wide ? "wide" : ""}`}
+      className={`game-dialog ${wide ? "wide" : ""} ${closing ? "dialog-closing" : ""}`}
       ref={ref}
       aria-label={title}
       onCancel={(e) => {
-        if (onClose) onClose();
-        else e.preventDefault();
+        e.preventDefault();
+        dismiss();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose?.();
+        if (e.target === e.currentTarget) dismiss();
       }}
     >
       <div className="dialog-content">
         <div className="dialog-top">
           <h2>{title}</h2>
           {onClose && (
-            <button className="icon-button" aria-label="关闭" onClick={onClose}>
+            <button className="icon-button" aria-label="关闭" onClick={dismiss}>
               <Icon name="close" />
             </button>
           )}

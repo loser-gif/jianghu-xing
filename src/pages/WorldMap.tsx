@@ -77,6 +77,7 @@ export function WorldMap({
             className={`map-pin ${s.location === l.id ? "current" : ""} ${selected === l.id ? "selected" : ""}`}
             style={{ left: `${l.x}%`, top: `${l.y}%` }}
             onClick={() => setSelected(l.id)}
+            aria-pressed={selected === l.id}
           >
             <span>
               <Icon name={l.icon} size={20} />
@@ -94,7 +95,7 @@ export function WorldMap({
           <span>— 街巷水路</span>
         </div>
       </div>
-      <div className="map-detail">
+      <div className="map-detail" key={selected}>
         <Icon name={l.icon} size={30} />
         <div>
           <h2>

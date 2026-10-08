@@ -4849,7 +4849,7 @@ dialog::backdrop {
 
 @media (prefers-reduced-motion: no-preference) {
   .page-arrival {
-    animation: paper-arrive 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: paper-arrive 180ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
   dialog[open] {
     animation: paper-arrive 200ms ease-out both;
@@ -5206,7 +5206,6 @@ dialog::backdrop {
 .cultivation-heading h2 {
   font-size: 32px;
   margin: 8px 0 18px;
-  animation: realm-ink 1.2s ease both;
 }
 .realm-needs {
   display: flex;
@@ -6126,5 +6125,176 @@ dialog::backdrop {
   .content-arts .cultivation-panel > details {
     grid-column: 1/-1;
     margin-top: 0;
+  }
+}
+
+/* Interaction rhythm: immediate content, gentle feedback, stable reading space. */
+html {
+  scrollbar-gutter: stable;
+}
+.game-layout {
+  overflow-anchor: none;
+}
+.game-dialog,
+.item-dialog {
+  overflow: hidden;
+}
+.game-dialog .dialog-content,
+.item-dialog .dialog-content {
+  max-height: inherit;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #9c9d88 transparent;
+}
+.dialog-top {
+  gap: 16px;
+  padding-top: 10px;
+  padding-bottom: 12px;
+}
+.search:focus-within {
+  border-color: #7e896c;
+  box-shadow: 0 0 0 3px #89937519;
+  background-color: #faf6ea73;
+}
+.search input:focus-visible {
+  outline: none;
+}
+.tabs button {
+  min-height: 44px;
+}
+.tabs button:focus-visible,
+.desktop-sidebar button:focus-visible {
+  outline: 2px solid #7f7955;
+  outline-offset: -3px;
+}
+.equipment-row:focus-within,
+.person-row:focus-visible,
+.action-row:focus-visible {
+  border-color: #8b9478;
+  box-shadow: inset 3px 0 #a89c73;
+}
+.dialog-closing .dialog-content {
+  pointer-events: none;
+}
+@media (min-width: 1100px) {
+  .playing-layout .page-heading {
+    height: 132px;
+  }
+  .playing-layout .heading-copy {
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+  .playing-layout .heading-title h1 {
+    font-size: 44px;
+  }
+  .playing-layout .landscape {
+    height: 132px;
+  }
+  .content-arts .martial-intro {
+    padding: 15px 20px;
+    margin-top: 20px;
+  }
+  .content-arts .art-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .content-arts .art-study {
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .content-npc .people-tools {
+    margin-top: 0;
+  }
+  .content-inventory {
+    row-gap: 16px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .desktop-sidebar nav button,
+  .desktop-tools button,
+  .tabs button,
+  .action-row,
+  .icon-button,
+  .outline-button,
+  .button,
+  .filter-button,
+  .equip-button {
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease,
+      translate 160ms ease;
+  }
+  .search {
+    transition:
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+  }
+  .action-row > svg:last-child,
+  .row-arrow,
+  .loadout-arrow {
+    transition: translate 180ms ease;
+  }
+  .action-row:active:not(:disabled),
+  .icon-button:active:not(:disabled),
+  .tabs button:active {
+    translate: 0 1px;
+  }
+  .map-detail {
+    animation: paper-arrive 180ms ease-out;
+  }
+  .map-pin > span {
+    transition:
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  .map-pin.selected > span {
+    box-shadow: 0 0 0 5px #99997726;
+  }
+  dialog[open].dialog-closing {
+    animation: paper-depart 150ms ease-in both;
+  }
+  dialog[open].dialog-closing::backdrop {
+    animation: ink-backdrop 150ms ease-in reverse both;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .desktop-sidebar nav button:not([aria-current]):hover,
+    .desktop-tools button:hover {
+      translate: 2px 0;
+    }
+    .action-row:enabled:hover {
+      background-color: #a7af8d24;
+      border-color: #929b7d;
+    }
+    .action-row:enabled:hover > svg:last-child,
+    .person-row:hover .row-arrow,
+    .loadout button:hover .loadout-arrow {
+      translate: 3px 0;
+    }
+    .equipment-row:hover,
+    .art-card:hover {
+      border-color: #a1a58b;
+      background-color: #c4c9ae17;
+    }
+  }
+}
+@keyframes paper-depart {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-arrival,
+  .cultivation-heading h2,
+  .map-detail,
+  dialog[open],
+  dialog[open]::backdrop {
+    animation: none !important;
   }
 }

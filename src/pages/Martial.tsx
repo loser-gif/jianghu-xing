@@ -1,6 +1,5 @@
 import { CultivationPanel } from "../components/Progression";
 import { Tabs } from "../components/InkUI";
-import { useState } from "react";
 import { useGame } from "../store";
 import { arts, npcs, locations, npcLocation } from "../data/world";
 import { Icon, Button, Seal, Meter } from "../components/UI";
@@ -9,12 +8,15 @@ import type { GameState, Page } from "../types";
 export function Martial({
   s,
   navigate,
+  filter,
+  setFilter,
 }: {
   s: GameState;
   navigate: (p: Page) => void;
+  filter: string;
+  setFilter: (filter: string) => void;
 }) {
   const act = useGame((x) => x.act);
-  const [filter, setFilter] = useState("全部");
   return (
     <>
       <CultivationPanel s={s} />
