@@ -1,3 +1,4 @@
+import { lifespanByRealm } from "../engine/calendar";
 import { useGame } from "../store";
 import type { GameState, Page } from "../types";
 import { realms, breakthroughNeeds, realmBonus } from "../engine/cultivation";
@@ -42,9 +43,13 @@ export function CultivationPanel({ s }: { s: GameState }) {
         境界加成：气血 +{bonus.hp} · 内力 +{bonus.qi} · 外功 +{bonus.attack} ·
         防御 +{bonus.defense}
       </p>
+      <p className="small">
+        当前寿元上限{lifespanByRealm[s.cultivation.realm]}岁
+        {b.next ? ` · 下一境${lifespanByRealm[s.cultivation.realm + 1]}岁` : ""}
+      </p>
       <div className="progression-buttons">
         <Button onClick={() => act({ type: "meditate" })}>
-          凝神吐纳 · 一时辰
+          凝神吐纳 · 两时辰
         </Button>
         {b.next && (
           <Button

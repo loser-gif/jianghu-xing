@@ -8,6 +8,8 @@ const pages: [Page, string, string][] = [
   ["jianghu", "行走江湖", "mountain"],
   ["guide", "江湖路引", "compass"],
   ["trial", "问心试炼塔", "building"],
+  ["living", "百业生活", "leaf"],
+  ["calendar", "岁时与寿元", "compass"],
   ["character", "我的人物", "user"],
   ["inventory", "随身行囊", "bag"],
   ["arts", "武学修为", "book"],

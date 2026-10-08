@@ -27,6 +27,19 @@ export type GameState = {
   version: 1;
   started: boolean;
   cultivation: Cultivation;
+  life: { startAt: number; startAge: number; ended: boolean };
+  battle: {
+    strategy: "balanced" | "offense" | "guarded";
+    medicine: boolean;
+    speed: 1 | 2 | 4;
+  };
+  living: {
+    xp: { herbalism: number; smithing: number; fishing: number };
+    orders: Record<string, number>;
+    gathered: number;
+    crafted: number;
+    delivered: number;
+  };
   trial: {
     highest: number;
     wins: number;
@@ -169,4 +182,6 @@ export type Page =
   | "identity"
   | "journal"
   | "trial"
-  | "guide";
+  | "guide"
+  | "living"
+  | "calendar";

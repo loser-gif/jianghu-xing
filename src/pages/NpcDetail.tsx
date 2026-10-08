@@ -153,7 +153,7 @@ export function NpcDetail({
                   <small>
                     {needsTravel ? `前往${servicePlace}` : "查看详情"}
                     <br />
-                    {needsTravel ? "行程一时辰" : "此处可办"}
+                    {needsTravel ? "行程两时辰" : "此处可办"}
                   </small>
                 </button>
               </div>
@@ -164,7 +164,7 @@ export function NpcDetail({
                     ? `交谈与赠礼需当面进行，此刻可往${place}寻访。`
                     : !(s.inventory[n.gift] > 0)
                       ? `赠礼还需${giftName}，可先去商铺置办。`
-                      : "可交谈或赠礼，每次相处会推进一个时辰。"}
+                      : "可交谈或赠礼，每次相处会推进两个时辰。"}
               </p>
               {feedback && (
                 <div

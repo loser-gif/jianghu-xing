@@ -1,3 +1,6 @@
+import { initialLife, lifeInfo, timedCase } from "./calendar";
+import { initialBattle, autoDecision } from "./autobattle";
+import { initialLiving, livingAction } from "./living";
 import type { GameState, Condition, Effect, Stats } from "../types";
 import {
   arts,
@@ -25,6 +28,9 @@ export const freshState = (): GameState => ({
   version: 1,
   started: false,
   cultivation: initialCultivation(),
+  life: initialLife(),
+  battle: initialBattle(),
+  living: initialLiving(),
   trial: initialTrial(),
   player: {
     name: "沈辞",
@@ -237,6 +243,15 @@ export function createCharacter(
   return s;
 }
 export type Action =
+  | { type: "autoRound" }
+  | {
+      type: "battlePlan";
+      strategy?: GameState["battle"]["strategy"];
+      medicine?: boolean;
+      speed?: 1 | 2 | 4;
+    }
+  | { type: "seclusion"; days: number }
+  | { type: "gather" | "craft" | "order" | "sell"; id: string }
   | { type: "attribute"; id: keyof Stats }
   | { type: "trialEnter"; floor: number }
   | { type: "trialExchange"; id: string }
@@ -274,10 +289,37 @@ export type Action =
   | { type: "wait" }
   | { type: "retry" }
   | { type: "spar" };
-export function transition(current: GameState, action: Action): GameState {
+function applyAction(current: GameState, action: Action): GameState {
   const s = structuredClone(current);
   if (!s.started) return s;
   const stage = s.quest.stage;
+  if (action.type === "battlePlan") {
+    if (
+      action.strategy &&
+      ["balanced", "offense", "guarded"].includes(action.strategy)
+    )
+      s.battle.strategy = action.strategy;
+    if (typeof action.medicine === "boolean")
+      s.battle.medicine = action.medicine;
+    if (action.speed && [1, 2, 4].includes(action.speed))
+      s.battle.speed = action.speed;
+    return s;
+  }
+  if (action.type === "autoRound") {
+    if (!s.combat) return s;
+    if (s.combat.round > 300) {
+      const result = applyAction(s, { type: "fight", id: "escape" });
+      note(
+        result,
+        "交锋超过300回合仍未分胜负，自动撤离。请调整配装与修为后再战。",
+      );
+      return result;
+    }
+    return applyAction(s, {
+      type: "fight",
+      id: autoDecision(s, derived(s).maxHp).id,
+    });
+  }
   if (s.combat && action.type !== "fight") {
     note(s, "交锋尚未结束，请先完成当前回合。");
     return s;
@@ -295,6 +337,34 @@ export function transition(current: GameState, action: Action): GameState {
     return s;
   }
   switch (action.type) {
+    case "gather":
+    case "craft":
+    case "order":
+    case "sell": {
+      const result = livingAction(s, action.type, action.id);
+      note(s, result.text);
+      if (result.ticks) advance(s, result.ticks);
+      break;
+    }
+    case "seclusion": {
+      if (![1, 7, 30, 360].includes(action.days)) break;
+      if (timedCase(s)) {
+        note(s, "请先完成正在推进的案件，再安排长期闭关。");
+        break;
+      }
+      const days = action.days;
+      const gained = earnCultivation(
+        s,
+        Math.floor((days * 20) / (1 + Math.floor(s.cultivation.realm / 3))),
+      );
+      advance(s, days * 6);
+      s.player.qi = derived(s).maxQi;
+      note(
+        s,
+        `闭关${days}日，修为 +${gained}，内力恢复。岁月同步流逝，境界仍需手动突破。`,
+      );
+      break;
+    }
     case "attribute":
       if (
         !["root", "insight", "agility", "spirit"].includes(action.id) ||
@@ -344,11 +414,13 @@ export function transition(current: GameState, action: Action): GameState {
         maxHp: f.hp,
         round: 1,
         guarded: false,
-        logs: [`第 ${f.floor} 层 · ${f.name}。先看敌方意图，再选择行动。`],
+        logs: [
+          `第 ${f.floor} 层 · ${f.name}。自动交锋已就绪，可调整战术或暂停。`,
+        ],
       };
       note(
         s,
-        `登上试炼塔第 ${f.floor} 层，消耗一时辰。可随时撤离，保留已通关进度。`,
+        `登上试炼塔第 ${f.floor} 层，消耗两时辰。可随时撤离，保留已通关进度。`,
       );
       break;
     }
@@ -672,6 +744,23 @@ export function transition(current: GameState, action: Action): GameState {
       break;
     }
     case "use": {
+      if (["soup", "tonic"].includes(action.id) && s.inventory[action.id] > 0) {
+        const d = derived(s),
+          hp = action.id === "soup" ? 45 : 0,
+          qi = action.id === "soup" ? 30 : 60;
+        if ((hp === 0 || s.player.hp >= d.maxHp) && s.player.qi >= d.maxQi) {
+          note(s, "当前状态无需使用这份补给。");
+          break;
+        }
+        s.inventory[action.id]--;
+        s.player.hp = Math.min(d.maxHp, s.player.hp + hp);
+        s.player.qi = Math.min(d.maxQi, s.player.qi + qi);
+        note(
+          s,
+          `使用${action.id === "soup" ? "鲜鱼汤" : "凝神散"}，恢复至多${hp}气血、${qi}内力。`,
+        );
+        break;
+      }
       if (action.id === "medicine" && s.inventory.medicine > 0) {
         if (s.player.hp >= derived(s).maxHp) {
           note(s, "当前气血充盈，无需用药。");
@@ -864,7 +953,7 @@ export function transition(current: GameState, action: Action): GameState {
         s.flags.false_trail = true;
         note(
           s,
-          "西巷足迹过于整齐，是故布疑阵。你绕路耗去两个时辰，气血 −12。仍可返回追踪。",
+          "西巷足迹过于整齐，是故布疑阵。你绕路耗去四个时辰，气血 −12。仍可返回追踪。",
         );
         advance(s, 2);
         break;
@@ -1122,7 +1211,7 @@ export function transition(current: GameState, action: Action): GameState {
       s.player.silver -= cost;
       s.player.hp = derived(s).maxHp;
       s.player.qi = derived(s).maxQi;
-      note(s, `客栈歇息，气血与内力恢复。花费 ${cost} 两，三个时辰过去。`);
+      note(s, `客栈歇息，气血与内力恢复。花费 ${cost} 两，六个时辰过去。`);
       advance(s, 3);
       break;
     }
@@ -1138,7 +1227,7 @@ export function transition(current: GameState, action: Action): GameState {
       } else {
         s.player.hp = Math.min(derived(s).maxHp, s.player.hp + 80);
         s.player.qi = Math.min(derived(s).maxQi, s.player.qi + 40);
-        note(s, "白芷让你留在药庐免费静养。气血 +80，内力 +40，耗时三个时辰。");
+        note(s, "白芷让你留在药庐免费静养。气血 +80，内力 +40，耗时六个时辰。");
         advance(s, 3);
       }
       relation(s, "baizhi", 1, 1);
@@ -1176,5 +1265,41 @@ export function transition(current: GameState, action: Action): GameState {
       break;
     }
   }
+  return s;
+}
+
+export function transition(current: GameState, action: Action): GameState {
+  if (current.life.ended) {
+    const stopped = structuredClone(current);
+    stopped.lastMessage =
+      "此生已结卷。可回看人物与手记、导出存档，或返回主菜单开启新的江湖。";
+    return stopped;
+  }
+  const s = applyAction(current, action);
+  if (!s.started) return s;
+  const info = lifeInfo(s);
+  if (s.time >= info.endAt) {
+    // Crossing the lifespan boundary settles before granting the unfinished action's rewards.
+    const ended = structuredClone(current);
+    ended.time = lifeInfo(current).endAt;
+    ended.life.ended = true;
+    ended.combat = null;
+    ended.activeEvent = null;
+    if (timedCase(ended)) {
+      ended.quest.stage = "failed";
+      ended.quest.failure = "人生结卷，未竟的案卷留待后来人。";
+    }
+    note(
+      ended,
+      `享年${lifeInfo(ended).lifespan}岁，江湖一生于此结卷。存档完整保留，可回看经历或导出留念。`,
+    );
+    return ended;
+  }
+  const before = lifeInfo(current);
+  if (info.age > before.age)
+    note(
+      s,
+      `${s.lastMessage} 岁序更迭，你已${info.age}岁，寿元上限${info.lifespan}岁。`,
+    );
   return s;
 }

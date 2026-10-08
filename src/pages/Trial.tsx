@@ -23,8 +23,9 @@ export function Trial({
   const busy = !["locked", "available", "completed", "failed"].includes(
     s.quest.stage,
   );
-  const reason =
-    selected > s.trial.highest + 1
+  const reason = s.life.ended
+    ? "此生已结卷，可回看人物与手记"
+    : selected > s.trial.highest + 1
       ? "先通关前一层"
       : busy
         ? "先处理计时中的缉捕案"
@@ -39,7 +40,7 @@ export function Trial({
         <span className="eyebrow">西湖畔 · 问心试炼</span>
         <h2>三十层，一步一试剑</h2>
         <p>
-          看清意图，调配招式。每5层遇守关人；可随时撤离，已通关进度永久保留。
+          战前配装，自动交锋。每5层遇守关人；战斗可暂停、倍速或撤离，已通关进度永久保留。
         </p>
         <div className="trial-totals">
           <span>
@@ -79,7 +80,7 @@ export function Trial({
                 navigate("jianghu");
               }}
             >
-              前往药庐 · 一时辰
+              前往药庐 · 两时辰
             </Button>
           </div>
         </section>
@@ -151,7 +152,7 @@ export function Trial({
           </div>
           {s.location !== "lake" && (
             <Button onClick={() => act({ type: "move", id: "lake" })}>
-              前往西湖 · 一时辰
+              前往西湖 · 两时辰
             </Button>
           )}
           <Button
@@ -159,7 +160,7 @@ export function Trial({
             disabled={!!reason}
             onClick={() => act({ type: "trialEnter", floor: selected })}
           >
-            挑战第 {selected} 层 · 一时辰
+            挑战第 {selected} 层 · 两时辰
           </Button>
           <p className="small muted">
             {reason || "无需门票。气血不会自动补满；战斗每回合自动保存。"}
@@ -197,7 +198,7 @@ export function Trial({
       <details className="trial-rules">
         <summary>奖励、失败与战斗规则</summary>
         <p>
-          每层首通奖励只发一次。已通关层每个游戏日可领取一次较少的修为与银两；其余挑战仅练习。新一天由游戏中的时辰推进，不需要现实签到。每次入塔消耗一时辰。
+          每层首通奖励只发一次。已通关层每个游戏日可领取一次较少的修为与银两；其余挑战仅练习。新一天由游戏中的时辰推进，不需要现实签到。每次入塔消耗两时辰。
         </p>
         <p>
           敌人依次切换守势、重击和换气。守势削弱普通攻击，武学可破守；防御或轻功化解重击后获得一次反击加成；换气回合是进攻机会。内功熟练度提高试炼中的防御回气。落败保留进度与物品，气血剩1；撤离没有额外惩罚。

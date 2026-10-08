@@ -102,7 +102,7 @@ export function WorldMap({
             {l.name}
             <span className="tag">{l.tag}</span>
           </h2>
-          <p>{l.subtitle}。前往此地消耗一个时辰。</p>
+          <p>{l.subtitle}。前往此地消耗两个时辰。</p>
         </div>
         <Button
           kind="ink"

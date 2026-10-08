@@ -10,6 +10,13 @@ export type Recommendation = {
   heal?: boolean;
 };
 export function recommend(s: GameState): Recommendation {
+  if (s.life.ended)
+    return {
+      title: "此生已结卷，故事仍留存",
+      text: "人物与行囊完整保留，可以回看手记、导出存档，或从主菜单开始新的人生。",
+      button: "回看江湖经历",
+      page: "journal",
+    };
   if (
     [
       "prepare",
@@ -30,7 +37,7 @@ export function recommend(s: GameState): Recommendation {
     return {
       title: "先疗伤，再闯荡",
       text: "气血偏低，贸然交锋容易落败。药庐可以恢复气血与内力，囊中羞涩也能免费静养。",
-      button: s.location === "herb" ? "请白芷疗伤" : "前往药庐 · 一时辰",
+      button: s.location === "herb" ? "请白芷疗伤" : "前往药庐 · 两时辰",
       destination: s.location === "herb" ? undefined : "herb",
       heal: s.location === "herb",
       page: "jianghu",
@@ -52,7 +59,7 @@ export function recommend(s: GameState): Recommendation {
   if (!s.trial.highest)
     return {
       title: "第三步 · 试炼塔初试身手",
-      text: "第一层用初始装备即可尝试。看敌方意图：守势用武学，蓄力时防御，露出破绽再反击。可以随时撤离。",
+      text: "第一层用初始装备即可尝试。进入后自动出招；均衡战术会守势用武学、蓄力时防御、抓住破绽反击。可暂停、倍速或撤离。",
       button: "查看试炼塔第一层",
       page: "trial",
     };
@@ -71,7 +78,7 @@ export function recommend(s: GameState): Recommendation {
     return {
       title: "把首通奖励变成实力",
       text: "你已有精铁与银两。前往铁匠铺，在行囊打开兵器详情，首次强化消耗精铁2块、银两20，外功 +3。",
-      button: s.location === "smith" ? "打开兵器行囊" : "前往铁匠铺 · 一时辰",
+      button: s.location === "smith" ? "打开兵器行囊" : "前往铁匠铺 · 两时辰",
       destination: s.location === "smith" ? undefined : "smith",
       page: "inventory",
     };
@@ -84,7 +91,7 @@ export function recommend(s: GameState): Recommendation {
     };
   return {
     title: "接下来，由你选择江湖路",
-    text: "继续闯塔检验配装，结识人物做委托，或入职捕快查案。卡关时先补给、修习和强化，不必反复硬打。",
+    text: "继续闯塔检验配装，采集制作做生活订单，结识人物，或入职捕快查案。卡关时先补给、修习和强化，不必反复硬打。",
     button: "选择一条玩法路线",
     page: "guide",
   };

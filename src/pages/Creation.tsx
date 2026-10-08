@@ -204,7 +204,7 @@ export function Creation({
                 <p className="selection-note">
                   {name} · {gender === "female" ? "女侠" : "少侠"} · {o.name}
                   <br />
-                  初始境界：入不流。由此积修为、悟武学，踏上自己的修行之路。
+                  初始年龄17岁，寿元80岁，境界入不流。行动推进年月，高境界延长寿元；离线不会变老。
                 </p>
                 <Section title="实际初始属性">
                   <div className="creation-stats">

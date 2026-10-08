@@ -6747,3 +6747,272 @@ html {
     grid-row: 1;
   }
 }
+
+/* 百业与岁时沿用宣纸、墨绿和细线布局。 */
+.life-section,
+.calendar-hero,
+.life-ending {
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-bottom: 22px;
+  background: #f4f0e633;
+}
+.life-section h2,
+.calendar-hero h2,
+.life-ending h2 {
+  font-size: 25px;
+  margin: 8px 0 16px;
+}
+.life-section p,
+.calendar-hero p,
+.life-ending p {
+  line-height: 1.8;
+  margin: 10px 0;
+}
+.life-section > .button {
+  margin: 8px 10px 8px 0;
+}
+.life-ending {
+  margin: 20px;
+  border-left: 4px solid var(--red);
+}
+.life-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 26px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+.life-readout b {
+  font-size: 23px;
+  margin-left: 6px;
+}
+.calendar-durations,
+.profession-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.calendar-durations button,
+.profession-tabs button {
+  border: 1px solid var(--line);
+  background: transparent;
+  padding: 14px;
+  min-height: 48px;
+  color: var(--ink);
+}
+.calendar-durations button[aria-pressed="true"],
+.profession-tabs button[aria-pressed="true"] {
+  background: #485644;
+  border-color: #485644;
+  color: #f4efdf;
+}
+.profession-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.profession-tabs button {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  text-align: left;
+}
+.profession-tabs small {
+  width: 100%;
+}
+.living-workshop {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 22px;
+  align-items: start;
+}
+.recipe-row {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.recipe-row h3 {
+  font-size: 21px;
+  margin: 0;
+}
+.living-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 14px 0;
+}
+.living-checklist .done {
+  color: #52754c;
+}
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+}
+.market-grid > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+.retreat-preview {
+  background: #9a865612;
+  padding: 12px 18px;
+  margin: 16px 0;
+  border-left: 3px solid var(--gold);
+}
+.lifespan-table {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.lifespan-table > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid var(--line);
+}
+.lifespan-table .active {
+  background: #83926822;
+  border-color: #788269;
+}
+.auto-battle-panel {
+  border: 1px solid var(--line);
+  background: #a4b39114;
+  padding: 16px;
+  margin: 14px 0;
+}
+.auto-battle-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  line-height: 1.7;
+}
+.auto-battle-status strong {
+  color: #45633d;
+}
+.auto-battle-controls {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  margin: 12px 0;
+}
+.auto-battle-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+.auto-battle-controls select {
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  background: #f3eedf;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 8px;
+  font: inherit;
+}
+.auto-medicine {
+  display: flex;
+  gap: 10px;
+  line-height: 1.6;
+  font-size: 14px;
+  align-items: center;
+  margin: 12px 0;
+}
+.auto-medicine input {
+  width: 18px;
+  height: 18px;
+  accent-color: #485644;
+}
+.game-topbar .calendar-link {
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (min-width: 1100px) {
+  .desktop-sidebar nav {
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+@media (max-width: 600px) {
+  .life-section,
+  .calendar-hero {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .life-section h2,
+  .calendar-hero h2 {
+    font-size: 22px;
+  }
+  .life-readout {
+    gap: 8px 18px;
+    font-size: 14px;
+  }
+  .life-readout b {
+    font-size: 19px;
+  }
+  .living-workshop,
+  .market-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .profession-tabs {
+    gap: 7px;
+  }
+  .profession-tabs button {
+    padding: 10px 8px;
+    gap: 7px;
+  }
+  .profession-tabs small {
+    font-size: 12px;
+  }
+  .calendar-durations {
+    gap: 7px;
+  }
+  .calendar-durations button {
+    padding: 8px;
+  }
+  .lifespan-table {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    font-size: 14px;
+  }
+  .auto-battle-panel {
+    padding: 11px;
+    margin: 10px 0;
+  }
+  .auto-battle-status {
+    font-size: 14px;
+    gap: 4px;
+  }
+  .auto-battle-controls {
+    margin: 8px 0;
+    gap: 8px;
+  }
+  .auto-battle-panel .progression-buttons {
+    flex-wrap: wrap;
+  }
+  .auto-battle-panel .button {
+    font-size: 14px;
+    padding: 8px;
+  }
+  .game-topbar .calendar-link {
+    max-width: 190px;
+    text-align: right;
+  }
+  .life-ending {
+    margin: 12px;
+    padding: 16px;
+  }
+}
+
+.calendar-link,
+.calendar-hero h2 {
+  word-break: keep-all;
+  line-height: 1.6;
+}

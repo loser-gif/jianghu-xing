@@ -1,3 +1,5 @@
+import { Living } from "./pages/Living";
+import { CalendarPage, LifeEnding } from "./pages/Calendar";
 import { DesktopNav } from "./components/DesktopNav";
 import { Trial } from "./pages/Trial";
 import { Guide } from "./pages/Guide";
@@ -37,6 +39,8 @@ import { meets } from "./engine/game";
 import type { NPC, Item, Page } from "./types";
 
 const titles: Record<Page, [string, string]> = {
+  living: ["百业生活", "一技立身，烟火亦江湖"],
+  calendar: ["岁时录", "看年岁流转，惜此生光阴"],
   trial: ["问心试炼", "三十层试剑，步步见成长"],
   guide: ["江湖路引", "先知去处，再行江湖"],
   jianghu: ["江湖行", "山水一程，幸会相逢"],
@@ -53,7 +57,7 @@ const pageHints: Partial<Record<Page, string>> = {
   inventory:
     "点击物品查看详情与换装对比；新装备要点「装备」。在铁匠铺打开装备详情可强化。",
   arts: "先看上方人物境界，再看下方武学。已有武学点「静心修习」；外功招式点「设为出战」。",
-  map: "先选地图上的地点，再点「动身前往」。查看地图不耗时，实际移动消耗一时辰。",
+  map: "先选地图上的地点，再点「动身前往」。查看地图不耗时，实际移动消耗两时辰。",
   npc: "人物详情可查看所在地。交谈、赠礼与请教需要当面进行；深夜人物可能换地方。",
   character:
     "基础属性影响战斗与事件；守关首通获得的潜能可在下方分配。提升气血上限不会自动回血。",
@@ -188,7 +192,12 @@ export default function App() {
               <span>
                 杭州 · {locations.find((l) => l.id === s.location)?.name}
               </span>
-              <span>{timeLabel(s.time)}</span>
+              <button
+                className="text-button calendar-link"
+                onClick={() => navigate("calendar")}
+              >
+                {timeLabel(s.time)}
+              </button>
               <button
                 className="topbar-guide"
                 onClick={() => navigate("guide")}
@@ -204,6 +213,12 @@ export default function App() {
                 <Icon name="save" />
               </button>
             </div>
+            <LifeEnding
+              s={s}
+              navigate={navigate}
+              onSave={() => setSaveOpen(true)}
+              onMenu={() => setScreen("menu")}
+            />
             <Header
               title={npc ? "人物谱" : relations ? "羁绊图" : titles[page][0]}
               subtitle={
@@ -311,12 +326,18 @@ export default function App() {
                   {page === "journal" && <Journal s={s} />}
                   {page === "trial" && <Trial s={s} navigate={navigate} />}
                   {page === "guide" && <Guide s={s} navigate={navigate} />}
+                  {page === "living" && <Living s={s} navigate={navigate} />}
+                  {page === "calendar" && (
+                    <CalendarPage s={s} navigate={navigate} />
+                  )}
                 </>
               )}
               <nav className="utility-nav" aria-label="更多功能">
                 {(
                   [
                     ["guide", "江湖路引"],
+                    ["living", "百业生活"],
+                    ["calendar", "岁时与寿元"],
                     ["trial", "试炼塔"],
                     ["character", "我的人物"],
                     ["identity", "身份司簿"],

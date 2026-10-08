@@ -1,3 +1,4 @@
+import { LifeReadout } from "./Calendar";
 import { CultivationPanel } from "../components/Progression";
 import { useGame } from "../store";
 import { ItemArt } from "../components/Reference";
@@ -61,6 +62,10 @@ export function Character({
           </button>
         ))}
       </div>
+      <LifeReadout s={s} />
+      <button className="text-button" onClick={() => navigate("calendar")}>
+        查看生日、寿元与闭关安排
+      </button>
       <CultivationPanel s={s} />
       <Section title="根骨心性">
         <p className="small muted">

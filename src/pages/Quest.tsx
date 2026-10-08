@@ -228,7 +228,7 @@ export function Quest({
                 <ActionRow
                   icon="search"
                   title="仔细比对足迹"
-                  description="凭身世、天赋或可信情报辨路；否则花一个时辰勘察"
+                  description="凭身世、天赋或可信情报辨路；否则花两个时辰勘察"
                   onClick={() => act({ type: "track", id: "observe" })}
                 />
                 <ActionRow

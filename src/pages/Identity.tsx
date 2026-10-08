@@ -1,3 +1,4 @@
+import { professions, professionRank, rankNames } from "../data/living";
 import { useGame } from "../store";
 import { stageLabels } from "../data/world";
 import { Icon, Button, Section, ActionRow } from "../components/UI";
@@ -32,6 +33,17 @@ export function Identity({
           </p>
         </div>
       </div>
+      <Section title="生活身份 · 可兼修">
+        <div className="profession-summary">
+          {professions.map((p) => (
+            <p key={p.id}>
+              {p.name} · {rankNames[professionRank(s.living.xp[p.id])]} · 熟练
+              {s.living.xp[p.id]}
+            </p>
+          ))}
+        </div>
+        <Button onClick={() => navigate("living")}>采集、生产与生活订单</Button>
+      </Section>
       <Section title="职业之路">
         <div className="career-path">
           {["捕快", "资深捕快", "总捕", "锦衣卫"].map((n, i) => (

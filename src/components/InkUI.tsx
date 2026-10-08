@@ -449,7 +449,10 @@ export function Detail({
             <dl>
               {[
                 ["姓名", n.name],
-                ["性别", `${n.gender} · ${n.age} 岁`],
+                [
+                  "性别",
+                  `${n.gender} · ${n.age + Math.floor(s.time / 2160)} 岁`,
+                ],
                 ["身份", n.role],
                 ["所在", `杭州 · ${place}`],
                 ["门派", n.faction],
@@ -517,13 +520,13 @@ export function Detail({
                 onClick={() => act({ type: "move", id: placeId })}
               >
                 <MapPin />
-                前往{place} · 一时辰
+                前往{place} · 两时辰
               </button>
             ) : (
               <p className="secondary">
                 {n.id === "gu"
                   ? "此人涉案，暂不可交谈与赠礼。"
-                  : "交谈或赠礼会推进一个时辰。"}
+                  : "交谈或赠礼会推进两个时辰。"}
               </p>
             )}
           </Panel>
@@ -546,7 +549,7 @@ export function Detail({
               </button>
               <p className="secondary">
                 {service.location && service.location !== s.location
-                  ? `前往${locations.find((l) => l.id === service.location)?.name}，行程一时辰。`
+                  ? `前往${locations.find((l) => l.id === service.location)?.name}，行程两时辰。`
                   : "查看相关事宜。"}
               </p>
             </Panel>
@@ -1058,7 +1061,7 @@ export function ItemDialog({
                 ? "已达强化上限"
                 : s.location === "smith"
                   ? "强化装备"
-                  : "前往铁匠铺 · 一时辰"}
+                  : "前往铁匠铺 · 两时辰"}
             </button>
           </Panel>
         )}
@@ -1075,19 +1078,36 @@ export function ItemDialog({
                 : "服用 · 恢复 65 气血"}
           </button>
         )}
-        {item.id !== "medicine" && item.kind !== "装备" && (
-          <p className="selection-note">
-            {item.id === "rope" || item.id === "cloth"
-              ? "在战后拘捕界面使用。"
-              : item.id === "charm"
-                ? "在后巷追踪时使用。"
-                : item.id === "iron"
-                  ? "在铁匠铺强化兵器时使用。"
-                  : item.id === "key"
-                    ? "在后巷探索事件中使用。"
-                    : "可在对应人物的详情中赠送，或在事件中使用。"}
-          </p>
+        {["soup", "tonic"].includes(item.id) && (
+          <button
+            className="ink-button full"
+            disabled={
+              !owned ||
+              (s.player.qi >= derived(s).maxQi &&
+                (item.id === "tonic" || s.player.hp >= derived(s).maxHp))
+            }
+            onClick={() => perform({ type: "use", id: item.id })}
+          >
+            使用补给 ·{" "}
+            {item.id === "soup" ? "恢复45气血与30内力" : "恢复60内力"}
+          </button>
         )}
+        {!["medicine", "soup", "tonic"].includes(item.id) &&
+          item.kind !== "装备" && (
+            <p className="selection-note">
+              {item.id === "rope" || item.id === "cloth"
+                ? "在战后拘捕界面使用。"
+                : item.id === "charm"
+                  ? "在后巷追踪时使用。"
+                  : item.id === "iron"
+                    ? "在铁匠铺强化兵器时使用。"
+                    : ["ore", "fish", "herb"].includes(item.id)
+                      ? "在百业生活中制作成品或交付订单，亦可前往客栈出售。"
+                      : item.id === "key"
+                        ? "在后巷探索事件中使用。"
+                        : "可在对应人物的详情中赠送，或在事件中使用。"}
+            </p>
+          )}
         {interacted && s.lastMessage && (
           <p role="status" className="feedback">
             {s.lastMessage}

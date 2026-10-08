@@ -98,6 +98,12 @@ export function Jianghu({
           >
             <div className="actions-list">
               <ActionRow
+                icon="leaf"
+                title="百业生活"
+                description="采药炼药、采矿锻造、垂钓烹饪 · 从一份材料开始"
+                onClick={() => navigate("living")}
+              />
+              <ActionRow
                 icon="building"
                 title="问心试炼塔"
                 description="30层挑战 · 首通获修为、精铁和试炼印"
@@ -128,7 +134,7 @@ export function Jianghu({
                 <ActionRow
                   icon="tea"
                   title="歇脚住店"
-                  description={`一夜安睡，恢复气血与内力 · ${s.flags.helped_suwan ? 4 : 8} 两 / 三个时辰`}
+                  description={`一夜安睡，恢复气血与内力 · ${s.flags.helped_suwan ? 4 : 8} 两 / 六个时辰`}
                   onClick={() => act({ type: "rest" })}
                 />
               )}{" "}
@@ -175,7 +181,7 @@ export function Jianghu({
                 }
                 description={
                   s.location === "office" && s.identity.rank
-                    ? "推进一个时辰，每日前两次可领 8 两"
+                    ? "推进两个时辰，每日前两次可领 8 两"
                     : "让时辰向前，看看此地的新变化"
                 }
                 onClick={() => act({ type: "wait" })}

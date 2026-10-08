@@ -1,8 +1,8 @@
+import { autoDecision } from "../engine/autobattle";
 import { realms } from "../engine/cultivation";
 import { trialFloors } from "../data/trial";
 import { trialIntent } from "../engine/trial";
 import { useGame } from "../store";
-import { arts } from "../data/world";
 import { Icon, Portrait, Button, Meter, Modal } from "../components/UI";
 import type { GameState } from "../types";
 import { derived } from "../engine/game";
@@ -41,11 +41,30 @@ function CombatPortrait({
 
 export function Combat({ s }: { s: GameState }) {
   const act = useGame((x) => x.act);
+  const storageError = useGame((x) => x.storageError);
   const c = s.combat!,
-    d = derived(s),
-    art = arts.find((a) => a.id === s.activeArt)!;
+    d = derived(s);
   const trial = c.kind === "trial" ? trialFloors[c.floor! - 1] : null;
   const intent = trial ? trialIntent(trial.floor, c.round) : null;
+  const [paused, setPaused] = useState(c.round > 1 || document.hidden);
+  const decision = autoDecision(s, d.maxHp);
+  useEffect(() => {
+    if (storageError) setPaused(true);
+  }, [storageError]);
+  useEffect(() => {
+    const pauseHidden = () => {
+      if (document.hidden) setPaused(true);
+    };
+    document.addEventListener("visibilitychange", pauseHidden);
+    return () => document.removeEventListener("visibilitychange", pauseHidden);
+  }, []);
+  useEffect(() => {
+    if (paused || document.hidden || storageError) return;
+    const timer = window.setTimeout(() => {
+      if (!document.hidden) act({ type: "autoRound" });
+    }, 1600 / s.battle.speed);
+    return () => window.clearTimeout(timer);
+  }, [paused, c.round, c.hp, s.battle, s.player.hp, storageError, act]);
   const previous = useRef({ round: c.round, player: s.player.hp, enemy: c.hp });
   const [pulse, setPulse] = useState<{
     round: number;
@@ -121,15 +140,75 @@ export function Combat({ s }: { s: GameState }) {
       {c.advantage && (
         <p className="trial-advantage">反击机会已就绪 · 下一次攻击伤害 +50%</p>
       )}
-      {trial && (
-        <p className="small">
-          {intent?.kind === "guard"
-            ? "建议：内力充足时施展武学，破开守势。"
-            : intent?.kind === "heavy"
-              ? "建议：防御调息或轻功，化解重击后再进攻。"
-              : "建议：把握换气破绽，使用武学或普通攻击。"}
+      <section className="auto-battle-panel" aria-label="自动战斗设置">
+        {storageError && (
+          <p role="alert">{storageError} 自动战斗已暂停；请先处理保存问题。</p>
+        )}
+        <div className="auto-battle-status">
+          <strong>{paused ? "自动战斗已暂停" : "自动交锋中"}</strong>
+          <span>下一步：{decision.reason}</span>
+        </div>
+        <div className="auto-battle-controls">
+          <label>
+            战术
+            <select
+              aria-label="战斗策略"
+              value={s.battle.strategy}
+              onChange={(e) =>
+                act({
+                  type: "battlePlan",
+                  strategy: e.target.value as GameState["battle"]["strategy"],
+                })
+              }
+            >
+              <option value="balanced">均衡 · 看破进退</option>
+              <option value="offense">强攻 · 招式优先</option>
+              <option value="guarded">谨慎 · 预留内力</option>
+            </select>
+          </label>
+          <label>
+            速度
+            <select
+              aria-label="战斗速度"
+              value={s.battle.speed}
+              onChange={(e) =>
+                act({
+                  type: "battlePlan",
+                  speed: Number(e.target.value) as 1 | 2 | 4,
+                })
+              }
+            >
+              <option value={1}>1倍</option>
+              <option value={2}>2倍</option>
+              <option value={4}>4倍</option>
+            </select>
+          </label>
+        </div>
+        <label className="auto-medicine">
+          <input
+            type="checkbox"
+            checked={s.battle.medicine}
+            onChange={(e) =>
+              act({ type: "battlePlan", medicine: e.target.checked })
+            }
+          />{" "}
+          气血≤35%时自动用金疮药（余{s.inventory.medicine || 0}）
+        </label>
+        <div className="progression-buttons">
+          <Button kind="ink" onClick={() => setPaused(!paused)}>
+            {paused ? "继续自动战斗" : "暂停战斗"}
+          </Button>
+          <Button
+            kind="danger"
+            onClick={() => act({ type: "fight", id: "escape" })}
+          >
+            {trial ? "撤离 · 保留进度" : "撤离 · 本案失利"}
+          </Button>
+        </div>
+        <p className="small muted">
+          每回合自动保存。切到后台会暂停；刷新后从主菜单继续，非首回合需手动恢复。不会自动挑战下一层。
         </p>
-      )}
+      </section>
       <div className="combat-log" aria-live="polite">
         {c.logs.slice(0, 5).map((l, i) => (
           <p key={`${c.round}-${i}`} className={i === 0 ? "latest" : ""}>
@@ -137,56 +216,6 @@ export function Combat({ s }: { s: GameState }) {
           </p>
         ))}
       </div>
-      <div className="combat-actions">
-        <Button kind="ink" onClick={() => act({ type: "fight", id: "attack" })}>
-          <Icon name="sword" size={17} />
-          普通攻击
-          <small>不消耗内力</small>
-        </Button>
-        <Button
-          disabled={s.player.qi < art.cost}
-          onClick={() => act({ type: "fight", id: "art" })}
-        >
-          <Icon name="book" size={17} />
-          {art.name}
-          <small>{art.cost} 内力</small>
-        </Button>
-        <Button onClick={() => act({ type: "fight", id: "defend" })}>
-          <Icon name="shield" size={17} />
-          防御调息
-          <small>减伤并回内力</small>
-        </Button>
-        <Button
-          disabled={!s.arts.lightArt || s.player.qi < 8}
-          onClick={() => act({ type: "fight", id: "light" })}
-        >
-          <Icon name="wind" size={17} />
-          追云步
-          <small>
-            {!s.arts.lightArt ? "尚未学会 · 试炼塔可兑换" : "8 内力"}
-          </small>
-        </Button>
-        <Button
-          disabled={!(s.inventory.medicine > 0) || s.player.hp >= d.maxHp}
-          onClick={() => act({ type: "fight", id: "medicine" })}
-        >
-          <Icon name="flask" size={17} />
-          金疮药 ×{s.inventory.medicine || 0}
-        </Button>
-        <Button
-          kind="danger"
-          onClick={() => act({ type: "fight", id: "escape" })}
-        >
-          {trial ? "撤离 · 保留通关进度" : "撤离 · 本次缉捕失败"}
-        </Button>
-      </div>
-      <p className="small muted">
-        普通攻击无需内力；防御减伤并调息；道具占用一回合。
-        {trial
-          ? "归元心法熟练度提高防御回气，兵器适配出战武学可增加20%招式伤害。"
-          : "防御恢复14内力。"}
-        每次行动均自动存档。
-      </p>
       <div className="inline-feedback" role="status">
         {s.lastMessage}
       </div>

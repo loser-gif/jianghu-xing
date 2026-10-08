@@ -1,3 +1,4 @@
+import { calendar } from "../engine/calendar";
 import type { NPC, Item, Stats } from "../types";
 export const periods = ["清晨", "上午", "午后", "傍晚", "夜晚", "深夜"];
 export const locations = [
@@ -264,6 +265,38 @@ export const talents = [
 ];
 export const items: Item[] = [
   {
+    id: "ore",
+    name: "铁矿石",
+    kind: "材料",
+    icon: "gem",
+    price: 4,
+    description: "铁匠铺采矿所得，可冶成精铁、打造装备。",
+  },
+  {
+    id: "fish",
+    name: "鲜鱼",
+    kind: "材料",
+    icon: "flask",
+    price: 4,
+    description: "西湖垂钓所得，可烹饪为随身补给。",
+  },
+  {
+    id: "soup",
+    name: "鲜鱼汤",
+    kind: "消耗",
+    icon: "tea",
+    price: 16,
+    description: "非战斗时恢复45气血和30内力，可交付生活订单。",
+  },
+  {
+    id: "tonic",
+    name: "凝神散",
+    kind: "消耗",
+    icon: "flask",
+    price: 24,
+    description: "非战斗时恢复60内力。",
+  },
+  {
     id: "oldSword",
     name: "旧铁剑",
     kind: "装备",
@@ -515,5 +548,7 @@ export const shopStock = (location: string): string[] => {
   };
   return stock[location] || [];
 };
-export const timeLabel = (time: number) =>
-  `九月${7 + Math.floor(time / 6)}日 · ${periods[time % 6]}`;
+export const timeLabel = (time: number) => {
+  const c = calendar(time);
+  return `大胤${c.year}年 ${c.month}月${c.day}日 · ${c.season} · ${periods[c.period]}`;
+};

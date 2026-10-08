@@ -1,3 +1,6 @@
+import { initialLife } from "./calendar";
+import { initialBattle } from "./autobattle";
+import { initialLiving } from "./living";
 import type { GameState } from "../types";
 import { locations, items, arts, npcs } from "../data/world";
 import { events } from "../data/events";
@@ -43,6 +46,46 @@ export function validState(v: unknown): v is GameState {
       Number(c.insights) < 0 ||
       Number(c.day) < -1 ||
       Number(c.sessions) < 0
+    )
+      return false;
+  }
+  if (
+    v.life !== undefined &&
+    (!isObject(v.life) ||
+      !Number.isSafeInteger(v.life.startAt) ||
+      Number(v.life.startAt) < 0 ||
+      Number(v.life.startAt) > Number(v.time) ||
+      !Number.isSafeInteger(v.life.startAge) ||
+      Number(v.life.startAge) < 1 ||
+      Number(v.life.startAge) > 79 ||
+      typeof v.life.ended !== "boolean")
+  )
+    return false;
+  if (
+    v.battle !== undefined &&
+    (!isObject(v.battle) ||
+      !["balanced", "offense", "guarded"].includes(String(v.battle.strategy)) ||
+      typeof v.battle.medicine !== "boolean" ||
+      typeof v.battle.speed !== "number" ||
+      ![1, 2, 4].includes(v.battle.speed))
+  )
+    return false;
+  if (v.living !== undefined) {
+    const l = v.living;
+    if (
+      !isObject(l) ||
+      !numbers(l.xp) ||
+      !["herbalism", "smithing", "fishing"].every((k) =>
+        Number.isSafeInteger((l.xp as Record<string, number>)[k]),
+      ) ||
+      !numbers(l.orders) ||
+      !Object.entries(l.orders as Record<string, number>).every(
+        ([k, d]) =>
+          ["clinic", "forge", "inn"].includes(k) && Number.isSafeInteger(d),
+      ) ||
+      !["gathered", "crafted", "delivered"].every(
+        (k) => Number.isSafeInteger(l[k]) && Number(l[k]) >= 0,
+      )
     )
       return false;
   }
@@ -230,6 +273,9 @@ export function parseSave(raw: string): SaveRecord {
     throw new Error("存档格式不兼容或内容损坏。当前进度未被更改。");
   const s = data.state as GameState;
   if (!s.trial) s.trial = initialTrial();
+  if (!s.life) s.life = initialLife(s.time);
+  if (!s.battle) s.battle = initialBattle();
+  if (!s.living) s.living = initialLiving();
   if (!s.player.gender) {
     s.player.gender = "male";
     s.flags.appearance_chosen = false;
