@@ -213,4 +213,5 @@ export type Page =
   | "living"
   | "calendar"
   | "sect"
-  | "court";
+  | "court"
+  | "forge";

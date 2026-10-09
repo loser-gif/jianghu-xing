@@ -68,8 +68,8 @@ export const trialExchanges = [
   },
 ];
 export const weaponFits: Record<string, string[]> = {
-  swordArt: ["oldSword", "sword"],
-  saberArt: ["saber"],
-  fistArt: ["glove"],
-  fanArt: ["fan"],
+  swordArt: ["oldSword", "sword", "deepSword"],
+  saberArt: ["saber", "tideSaber"],
+  fistArt: ["glove", "steelGlove"],
+  fanArt: ["fan", "darkFan"],
 };

@@ -9,6 +9,7 @@ const pages: [Page, string, string][] = [
   ["guide", "江湖路引", "compass"],
   ["trial", "问心试炼塔", "building"],
   ["living", "百业生活", "leaf"],
+  ["forge", "百炼坊", "hammer"],
   ["sect", "宗门与传承", "flag"],
   ["calendar", "岁时与寿元", "compass"],
   ["character", "我的人物", "user"],

@@ -827,6 +827,11 @@ export function Equipment({
       {stats.set && (
         <p className="selection-note">行云两件套已生效 · 气血上限 +30</p>
       )}
+      {stats.tideSet && (
+        <p className="selection-note">
+          踏浪两件套已生效 · 气血上限 +60、防御 +4
+        </p>
+      )}
       <div className="equipment-list">
         {own.map((i) => (
           <article className="equipment-row" key={i.id}>
@@ -1012,6 +1017,14 @@ export function ItemDialog({
             )}
             {preview.before.set && !preview.after.set && (
               <p className="set-note">更换后行云两件套失效</p>
+            )}
+            {preview.after.tideSet && !preview.before.tideSet && (
+              <p className="set-note">
+                将激活踏浪两件套 · 气血上限 +60、防御 +4
+              </p>
+            )}
+            {preview.before.tideSet && !preview.after.tideSet && (
+              <p className="set-note">更换后踏浪两件套失效</p>
             )}
             <p className="secondary">
               已计入强化与套装效果。提升气血上限不会恢复当前气血。

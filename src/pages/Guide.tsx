@@ -48,6 +48,13 @@ const routes: {
   button: string;
 }[] = [
   {
+    title: "我要打造进阶器甲",
+    icon: "hammer",
+    page: "forge",
+    text: "百业生活中采矿冶铁练熟练 → 七品、熟手、通关5层打造踏浪护具 → 五品、名匠、通关10层打造四类兵器。到百炼坊查看全部缺口与换装对比；旧装备强化可花50两、精铁2块传承到同部位器甲。",
+    button: "查看百炼图谱",
+  },
+  {
     title: "我要晋升总捕与锦衣卫",
     icon: "shield",
     page: "court",

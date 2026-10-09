@@ -1,6 +1,7 @@
 import { initialLife, lifeInfo, timedCase } from "./calendar";
 import { initialBattle, autoDecision } from "./autobattle";
 import { initialLiving, livingAction } from "./living";
+import { forgeAction, type ForgeAction } from "./forge";
 import { initialSect, sectAction, type SectAction } from "./sect";
 import {
   initialCourt,
@@ -89,6 +90,8 @@ export function derived(s: GameState) {
     .map((id) => items.find((i) => i.id === id))
     .filter(Boolean);
   const set = s.equipped.armor === "robe" && s.equipped.feet === "boots";
+  const tideSet =
+    s.equipped.armor === "tideRobe" && s.equipped.feet === "tideBoots";
   return {
     maxHp:
       bonus.hp +
@@ -100,7 +103,7 @@ export function derived(s: GameState) {
         (n, g) => n + (g?.slot !== "weapon" ? (s.upgrades[g!.id] || 0) * 5 : 0),
         0,
       ) +
-      (set ? 30 : 0),
+      (set ? 30 : tideSet ? 60 : 0),
     maxQi: bonus.qi + 60 + s.player.stats.spirit,
     attack:
       bonus.attack +
@@ -110,6 +113,7 @@ export function derived(s: GameState) {
       (s.upgrades[s.equipped.weapon] || 0) * 3 +
       (s.player.talents.includes("fierce") ? 4 : 0),
     defense:
+      (tideSet ? 4 : 0) +
       bonus.defense +
       5 +
       Math.floor(s.player.stats.root / 12) +
@@ -121,6 +125,7 @@ export function derived(s: GameState) {
         0,
       ),
     set,
+    tideSet,
   };
 }
 export function meets(s: GameState, c: Condition = {}) {
@@ -258,6 +263,7 @@ export function createCharacter(
 }
 export type Action =
   | CourtAction
+  | ForgeAction
   | SectAction
   | { type: "autoRound" }
   | {
@@ -360,6 +366,13 @@ function applyAction(current: GameState, action: Action): GameState {
   }
   if (action.type.startsWith("court")) {
     const result = courtAction(s, action as CourtAction, derived(s).maxHp);
+    note(s, result.text);
+    if (result.ticks) advance(s, result.ticks);
+    return s;
+  }
+  if (action.type === "forgeCraft" || action.type === "forgeTransfer") {
+    const result = forgeAction(s, action);
+    s.player.hp = Math.min(s.player.hp, derived(s).maxHp);
     note(s, result.text);
     if (result.ticks) advance(s, result.ticks);
     return s;
@@ -1075,12 +1088,16 @@ function applyAction(current: GameState, action: Action): GameState {
         }
         s.player.qi -= art.cost;
         const synergy =
-          s.activeArt === "swordArt" && s.equipped.weapon === "sword"
+          s.activeArt === "swordArt" &&
+          ["sword", "deepSword"].includes(s.equipped.weapon)
             ? 8
-            : s.activeArt === "saberArt" && s.equipped.weapon === "saber"
+            : s.activeArt === "saberArt" &&
+                ["saber", "tideSaber"].includes(s.equipped.weapon)
               ? 6
-              : (s.activeArt === "fistArt" && s.equipped.weapon === "glove") ||
-                  (s.activeArt === "fanArt" && s.equipped.weapon === "fan")
+              : (s.activeArt === "fistArt" &&
+                    ["glove", "steelGlove"].includes(s.equipped.weapon)) ||
+                  (s.activeArt === "fanArt" &&
+                    ["fan", "darkFan"].includes(s.equipped.weapon))
                 ? 5
                 : 0;
         damage =

@@ -171,6 +171,11 @@ export function Character({
         {d.set && (
           <p className="selection-note">行云两件套已生效 · 气血上限 +30</p>
         )}
+        {d.tideSet && (
+          <p className="selection-note">
+            踏浪两件套已生效 · 气血上限 +60、防御 +4
+          </p>
+        )}
       </Section>
       <div className="destination-list">
         <button onClick={() => navigate("npc")}>

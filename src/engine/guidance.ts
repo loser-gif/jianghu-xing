@@ -1,6 +1,8 @@
 import type { GameState, Page } from "../types";
 import { breakthroughNeeds } from "./cultivation";
 import { derived } from "./game";
+import { forgeRecipes } from "../data/forge";
+import { forgeNeeds } from "./forge";
 export type Recommendation = {
   title: string;
   text: string;
@@ -95,6 +97,17 @@ export function recommend(s: GameState): Recommendation {
       text: `当前修为 ${s.cultivation.xp}/60。到武学录修习或凝神吐纳，达到60后点击「突破 · 九品」。境界与武学熟练度分别成长。`,
       button: "前往修习与破境",
       page: "arts",
+    };
+  if (
+    forgeRecipes.some(
+      (r) => !s.inventory[r.id] && forgeNeeds(s, r.id).every((n) => n.met),
+    )
+  )
+    return {
+      title: "炉火已备，打造一件合手器甲",
+      text: "你已满足百炼坊的部分图谱条件。先看换装对比再锻造；成品从+0起步，旧器强化可以传承。",
+      button: "查看可锻造器甲",
+      page: "forge",
     };
   return {
     title: "接下来，由你选择江湖路",

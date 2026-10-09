@@ -97,6 +97,14 @@ export function Jianghu({
             aside={<span className="small muted">一步一选择，一念一江湖</span>}
           >
             <div className="actions-list">
+              {s.location === "smith" && (
+                <ActionRow
+                  icon="hammer"
+                  title="百炼坊"
+                  description="熟手护具、名匠兵器与强化传承 · 查看图谱缺口"
+                  onClick={() => navigate("forge")}
+                />
+              )}
               <ActionRow
                 icon="flag"
                 title="宗门与传承"

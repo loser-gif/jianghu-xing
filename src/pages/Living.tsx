@@ -19,7 +19,13 @@ export function Living({
   navigate: (p: Page) => void;
 }) {
   const act = useGame((x) => x.act),
-    [job, setJob] = useState<Profession>("herbalism");
+    [job, setJob] = useState<Profession>(
+      s.location === "smith"
+        ? "smithing"
+        : s.location === "lake"
+          ? "fishing"
+          : "herbalism",
+    );
   const p = professions.find((x) => x.id === job)!,
     rank = professionRank(s.living.xp[job]),
     here = s.location === p.location;
@@ -204,6 +210,9 @@ export function Living({
         </div>
       </section>
       <div className="progression-buttons">
+        <Button onClick={() => navigate("forge")}>
+          百炼坊 · 进阶器甲与强化传承
+        </Button>
         <Button onClick={() => navigate("inventory")}>
           行囊 · 使用补给 / 装备成品
         </Button>

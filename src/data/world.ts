@@ -1,4 +1,5 @@
 import { calendar } from "../engine/calendar";
+import { forgedItems } from "./forge";
 import type { NPC, Item, Stats } from "../types";
 export const periods = ["清晨", "上午", "午后", "傍晚", "夜晚", "深夜"];
 export const locations = [
@@ -264,6 +265,7 @@ export const talents = [
   { id: "sword", name: "天生剑心", description: "剑法伤害 +6，学习门槛降低" },
 ];
 export const items: Item[] = [
+  ...forgedItems,
   {
     id: "ore",
     name: "铁矿石",

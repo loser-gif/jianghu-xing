@@ -1,6 +1,7 @@
 import { Living } from "./pages/Living";
 import { Sect } from "./pages/Sect";
 import { Court } from "./pages/Court";
+import { Forge } from "./pages/Forge";
 import { CalendarPage, LifeEnding } from "./pages/Calendar";
 import { DesktopNav } from "./components/DesktopNav";
 import { Trial } from "./pages/Trial";
@@ -41,6 +42,7 @@ import { meets } from "./engine/game";
 import type { NPC, Item, Page } from "./types";
 
 const titles: Record<Page, [string, string]> = {
+  forge: ["百炼坊", "炉火不熄，旧器新锋"],
   court: ["朝廷案牍", "察事明理，守一方清平"],
   sect: ["宗门志", "师承有来处，薪火自相传"],
   living: ["百业生活", "一技立身，烟火亦江湖"],
@@ -334,6 +336,7 @@ export default function App() {
                   {page === "living" && <Living s={s} navigate={navigate} />}
                   {page === "sect" && <Sect s={s} navigate={navigate} />}
                   {page === "court" && <Court s={s} navigate={navigate} />}
+                  {page === "forge" && <Forge s={s} navigate={navigate} />}
                   {page === "calendar" && (
                     <CalendarPage s={s} navigate={navigate} />
                   )}
@@ -344,6 +347,7 @@ export default function App() {
                   [
                     ["guide", "江湖路引"],
                     ["living", "百业生活"],
+                    ["forge", "百炼坊"],
                     ["sect", "宗门与传承"],
                     ["court", "朝廷案牍"],
                     ["calendar", "岁时与寿元"],
