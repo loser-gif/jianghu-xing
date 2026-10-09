@@ -1,4 +1,5 @@
 import { professions, professionRank, rankNames } from "../data/living";
+import { sectInfo, sectTitle } from "../engine/sect";
 import { useGame } from "../store";
 import { stageLabels } from "../data/world";
 import { Icon, Button, Section, ActionRow } from "../components/UI";
@@ -43,6 +44,12 @@ export function Identity({
           ))}
         </div>
         <Button onClick={() => navigate("living")}>采集、生产与生活订单</Button>
+      </Section>
+      <Section title="师门身份 · 可与公门并行">
+        <p>
+          {sectInfo(s)?.name || "无门无派"} · {sectTitle(s)}
+        </p>
+        <Button onClick={() => navigate("sect")}>查看宗门与传承</Button>
       </Section>
       <Section title="职业之路">
         <div className="career-path">

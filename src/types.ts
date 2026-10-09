@@ -40,6 +40,17 @@ export type GameState = {
     crafted: number;
     delivered: number;
   };
+  sect: {
+    id: string | null;
+    name: string;
+    rank: number;
+    contribution: number;
+    merit: number;
+    daily: Record<string, number>;
+    claimedFloor: number;
+    estate: number;
+    disciples: number;
+  };
   trial: {
     highest: number;
     wins: number;
@@ -184,4 +195,5 @@ export type Page =
   | "trial"
   | "guide"
   | "living"
-  | "calendar";
+  | "calendar"
+  | "sect";

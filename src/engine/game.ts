@@ -1,6 +1,7 @@
 import { initialLife, lifeInfo, timedCase } from "./calendar";
 import { initialBattle, autoDecision } from "./autobattle";
 import { initialLiving, livingAction } from "./living";
+import { initialSect, sectAction, type SectAction } from "./sect";
 import type { GameState, Condition, Effect, Stats } from "../types";
 import {
   arts,
@@ -31,6 +32,7 @@ export const freshState = (): GameState => ({
   life: initialLife(),
   battle: initialBattle(),
   living: initialLiving(),
+  sect: initialSect(),
   trial: initialTrial(),
   player: {
     name: "沈辞",
@@ -243,6 +245,7 @@ export function createCharacter(
   return s;
 }
 export type Action =
+  | SectAction
   | { type: "autoRound" }
   | {
       type: "battlePlan";
@@ -334,6 +337,12 @@ function applyAction(current: GameState, action: Action): GameState {
   }
   if (s.activeEvent && action.type !== "choice") {
     note(s, "请先回应眼前这段际遇。");
+    return s;
+  }
+  if (action.type.startsWith("sect")) {
+    const result = sectAction(s, action as SectAction);
+    note(s, result.text);
+    if (result.ticks) advance(s, result.ticks);
     return s;
   }
   switch (action.type) {

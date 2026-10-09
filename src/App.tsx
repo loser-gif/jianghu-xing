@@ -1,4 +1,5 @@
 import { Living } from "./pages/Living";
+import { Sect } from "./pages/Sect";
 import { CalendarPage, LifeEnding } from "./pages/Calendar";
 import { DesktopNav } from "./components/DesktopNav";
 import { Trial } from "./pages/Trial";
@@ -39,6 +40,7 @@ import { meets } from "./engine/game";
 import type { NPC, Item, Page } from "./types";
 
 const titles: Record<Page, [string, string]> = {
+  sect: ["宗门志", "师承有来处，薪火自相传"],
   living: ["百业生活", "一技立身，烟火亦江湖"],
   calendar: ["岁时录", "看年岁流转，惜此生光阴"],
   trial: ["问心试炼", "三十层试剑，步步见成长"],
@@ -327,6 +329,7 @@ export default function App() {
                   {page === "trial" && <Trial s={s} navigate={navigate} />}
                   {page === "guide" && <Guide s={s} navigate={navigate} />}
                   {page === "living" && <Living s={s} navigate={navigate} />}
+                  {page === "sect" && <Sect s={s} navigate={navigate} />}
                   {page === "calendar" && (
                     <CalendarPage s={s} navigate={navigate} />
                   )}
@@ -337,6 +340,7 @@ export default function App() {
                   [
                     ["guide", "江湖路引"],
                     ["living", "百业生活"],
+                    ["sect", "宗门与传承"],
                     ["calendar", "岁时与寿元"],
                     ["trial", "试炼塔"],
                     ["character", "我的人物"],

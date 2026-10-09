@@ -91,7 +91,7 @@ export function recommend(s: GameState): Recommendation {
     };
   return {
     title: "接下来，由你选择江湖路",
-    text: "继续闯塔检验配装，采集制作做生活订单，结识人物，或入职捕快查案。卡关时先补给、修习和强化，不必反复硬打。",
+    text: "拜入宗门做事务、闯塔晋升，或采集制作做订单、结识人物、入职捕快查案。卡关时先补给、修习和强化，不必反复硬打。",
     button: "选择一条玩法路线",
     page: "guide",
   };

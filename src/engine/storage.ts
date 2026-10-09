@@ -1,6 +1,8 @@
 import { initialLife } from "./calendar";
 import { initialBattle } from "./autobattle";
 import { initialLiving } from "./living";
+import { initialSect } from "./sect";
+import { sects, sectDailyKeys } from "../data/sects";
 import type { GameState } from "../types";
 import { locations, items, arts, npcs } from "../data/world";
 import { events } from "../data/events";
@@ -91,6 +93,54 @@ export function validState(v: unknown): v is GameState {
   }
   const p = v.player,
     q = v.quest;
+  if (v.sect !== undefined) {
+    const t = v.sect;
+    if (
+      !isObject(t) ||
+      !(t.id === null || t.id === "own" || sects.some((x) => x.id === t.id)) ||
+      typeof t.name !== "string" ||
+      t.name.length > 8 ||
+      ![
+        "rank",
+        "contribution",
+        "merit",
+        "claimedFloor",
+        "estate",
+        "disciples",
+      ].every((k) => Number.isSafeInteger(t[k]) && Number(t[k]) >= 0) ||
+      Number(t.rank) > 3 ||
+      Number(t.contribution) > Number(t.merit) ||
+      Number(t.claimedFloor) > 30 ||
+      Number(t.estate) > 3 ||
+      Number(t.disciples) > Number(t.estate) * 3 ||
+      !numbers(t.daily) ||
+      !Object.entries(t.daily as Record<string, number>).every(
+        ([k, d]) =>
+          sectDailyKeys.includes(k) &&
+          Number.isSafeInteger(d) &&
+          d <= Math.floor(Number(v.time) / 6),
+      )
+    )
+      return false;
+    if (t.id === "own") {
+      if (
+        t.rank !== 3 ||
+        Number(t.estate) < 1 ||
+        !/^[\p{Script=Han}A-Za-z0-9]{2,8}$/u.test(t.name)
+      )
+        return false;
+    } else if (
+      t.estate !== 0 ||
+      t.disciples !== 0 ||
+      (t.id === null &&
+        (t.rank !== 0 ||
+          t.name !== "" ||
+          t.contribution !== 0 ||
+          t.merit !== 0)) ||
+      (t.id !== null && !sects.some((x) => x.id === t.id && x.name === t.name))
+    )
+      return false;
+  }
   if (v.trial !== undefined) {
     const t = v.trial;
     if (
@@ -276,6 +326,7 @@ export function parseSave(raw: string): SaveRecord {
   if (!s.life) s.life = initialLife(s.time);
   if (!s.battle) s.battle = initialBattle();
   if (!s.living) s.living = initialLiving();
+  if (!s.sect) s.sect = initialSect(s.trial.highest);
   if (!s.player.gender) {
     s.player.gender = "male";
     s.flags.appearance_chosen = false;

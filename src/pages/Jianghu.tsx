@@ -98,6 +98,12 @@ export function Jianghu({
           >
             <div className="actions-list">
               <ActionRow
+                icon="flag"
+                title="宗门与传承"
+                description="拜师晋升、宗门事务与自立门户 · 一步步找到师承"
+                onClick={() => navigate("sect")}
+              />
+              <ActionRow
                 icon="leaf"
                 title="百业生活"
                 description="采药炼药、采矿锻造、垂钓烹饪 · 从一份材料开始"
