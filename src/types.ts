@@ -51,6 +51,22 @@ export type GameState = {
     estate: number;
     disciples: number;
   };
+  court: {
+    active: null | {
+      id: string;
+      stage: "investigate" | "ready" | "combat" | "verdict";
+      acceptedAt: number;
+      evidence: string[];
+    };
+    completed: Record<string, "treasury" | "relief">;
+    attempted: Record<string, number>;
+    salaryDay: number;
+    result: null | {
+      id: string;
+      outcome: "win" | "loss" | "expired" | "abandoned";
+      text: string;
+    };
+  };
   trial: {
     highest: number;
     wins: number;
@@ -100,7 +116,7 @@ export type GameState = {
     failure: string;
   };
   combat: null | {
-    kind?: "trial";
+    kind?: "trial" | "court";
     floor?: number;
     advantage?: boolean;
     hp: number;
@@ -196,4 +212,5 @@ export type Page =
   | "guide"
   | "living"
   | "calendar"
-  | "sect";
+  | "sect"
+  | "court";

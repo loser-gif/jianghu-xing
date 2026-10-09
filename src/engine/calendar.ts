@@ -40,4 +40,5 @@ export function lifeInfo(s: GameState) {
   };
 }
 export const timedCase = (s: GameState) =>
+  !!s.court?.active ||
   !["locked", "available", "completed", "failed"].includes(s.quest.stage);

@@ -2,6 +2,15 @@ import { initialLife, lifeInfo, timedCase } from "./calendar";
 import { initialBattle, autoDecision } from "./autobattle";
 import { initialLiving, livingAction } from "./living";
 import { initialSect, sectAction, type SectAction } from "./sect";
+import {
+  initialCourt,
+  courtAction,
+  resolveCourtRound,
+  expireCourt,
+  officialNeeds,
+  type CourtAction,
+} from "./court";
+import { officialRanks } from "../data/court";
 import type { GameState, Condition, Effect, Stats } from "../types";
 import {
   arts,
@@ -33,6 +42,7 @@ export const freshState = (): GameState => ({
   battle: initialBattle(),
   living: initialLiving(),
   sect: initialSect(),
+  court: initialCourt(),
   trial: initialTrial(),
   player: {
     name: "沈辞",
@@ -174,6 +184,8 @@ function fail(s: GameState, reason: string) {
 }
 function advance(s: GameState, n = 1) {
   s.time += n;
+  const expired = expireCourt(s);
+  if (expired) note(s, expired);
   const stage = s.quest.stage;
   if (
     ["prepare", "investigate", "trail", "dock"].includes(stage) &&
@@ -245,6 +257,7 @@ export function createCharacter(
   return s;
 }
 export type Action =
+  | CourtAction
   | SectAction
   | { type: "autoRound" }
   | {
@@ -345,6 +358,12 @@ function applyAction(current: GameState, action: Action): GameState {
     if (result.ticks) advance(s, result.ticks);
     return s;
   }
+  if (action.type.startsWith("court")) {
+    const result = courtAction(s, action as CourtAction, derived(s).maxHp);
+    note(s, result.text);
+    if (result.ticks) advance(s, result.ticks);
+    return s;
+  }
   switch (action.type) {
     case "gather":
     case "craft":
@@ -405,7 +424,7 @@ function applyAction(current: GameState, action: Action): GameState {
         note(s, "试炼塔在西湖畔，请先前往西湖。");
         break;
       }
-      if (!["locked", "available", "completed", "failed"].includes(stage)) {
+      if (timedCase(s)) {
         note(s, "缉捕正在计时，请先处理当前案件，再来试炼。");
         break;
       }
@@ -892,18 +911,22 @@ function applyAction(current: GameState, action: Action): GameState {
     case "promote": {
       if (
         s.location !== "office" ||
-        s.identity.rank !== 1 ||
-        s.identity.contribution < 40 ||
-        s.identity.reputation < 25
+        s.identity.rank < 1 ||
+        s.identity.rank >= 4 ||
+        timedCase(s) ||
+        !officialNeeds(s).every((n) => n.met)
       ) {
-        note(s, "晋升需在官府交验：官府贡献 40，捕快声望 25。");
+        note(
+          s,
+          "请先处理当前案件，再在官府交验晋升条件；身份司簿列出了全部缺口。",
+        );
         break;
       }
-      s.identity.rank = 2;
+      s.identity.rank++;
       s.player.fame += 10;
       note(
         s,
-        "身份晋升 · 资深捕快。陆怀安郑重递来新腰牌，今后这座城，会记得你的名字。",
+        `身份晋升 · ${officialRanks[s.identity.rank]}。新腰牌已交付，可在朝廷案牍查看新案与俸银。`,
       );
       s.flags.promoted = true;
       break;
@@ -1004,6 +1027,10 @@ function applyAction(current: GameState, action: Action): GameState {
       if (!c) break;
       if (c.kind === "trial") {
         note(s, resolveTrialRound(s, action.id, derived(s)));
+        break;
+      }
+      if (c.kind === "court") {
+        note(s, resolveCourtRound(s, action.id, derived(s)));
         break;
       }
       const d = derived(s);
@@ -1294,6 +1321,14 @@ export function transition(current: GameState, action: Action): GameState {
     ended.life.ended = true;
     ended.combat = null;
     ended.activeEvent = null;
+    if (ended.court.active) {
+      ended.court.result = {
+        id: ended.court.active.id,
+        outcome: "abandoned",
+        text: "人生结卷，未竟案卷留待后来人。",
+      };
+      ended.court.active = null;
+    }
     if (timedCase(ended)) {
       ended.quest.stage = "failed";
       ended.quest.failure = "人生结卷，未竟的案卷留待后来人。";

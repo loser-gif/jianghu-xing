@@ -2,6 +2,8 @@ import { initialLife } from "./calendar";
 import { initialBattle } from "./autobattle";
 import { initialLiving } from "./living";
 import { initialSect } from "./sect";
+import { initialCourt } from "./court";
+import { courtCase } from "../data/court";
 import { sects, sectDailyKeys } from "../data/sects";
 import type { GameState } from "../types";
 import { locations, items, arts, npcs } from "../data/world";
@@ -93,6 +95,64 @@ export function validState(v: unknown): v is GameState {
   }
   const p = v.player,
     q = v.quest;
+  if (v.court !== undefined) {
+    const c = v.court;
+    if (
+      !isObject(c) ||
+      !Number.isSafeInteger(c.salaryDay) ||
+      Number(c.salaryDay) < -1 ||
+      Number(c.salaryDay) > Math.floor(Number(v.time) / 6) ||
+      !isObject(c.completed) ||
+      !Object.entries(c.completed).every(
+        ([id, choice]) =>
+          courtCase(id) && ["treasury", "relief"].includes(String(choice)),
+      ) ||
+      !numbers(c.attempted) ||
+      !Object.entries(c.attempted as Record<string, number>).every(
+        ([id, day]) =>
+          courtCase(id) &&
+          Number.isSafeInteger(day) &&
+          day <= Math.floor(Number(v.time) / 6),
+      ) ||
+      !(
+        c.result === null ||
+        (isObject(c.result) &&
+          courtCase(String(c.result.id)) &&
+          ["win", "loss", "expired", "abandoned"].includes(
+            String(c.result.outcome),
+          ) &&
+          typeof c.result.text === "string")
+      )
+    )
+      return false;
+    if (c.active !== null) {
+      const a = c.active;
+      if (!isObject(a)) return false;
+      const f = courtCase(String(a.id));
+      if (
+        !f ||
+        q.stage !== "completed" ||
+        (isObject(v.life) && v.life.ended === true) ||
+        (isObject(v.combat) && v.combat.kind !== "court") ||
+        Number(v.identity.rank) < f.rank ||
+        c.completed[f.id] ||
+        !["investigate", "ready", "combat", "verdict"].includes(
+          String(a.stage),
+        ) ||
+        !Number.isSafeInteger(a.acceptedAt) ||
+        Number(a.acceptedAt) < 0 ||
+        Number(a.acceptedAt) > Number(v.time) ||
+        !Array.isArray(a.evidence) ||
+        new Set(a.evidence).size !== a.evidence.length ||
+        !a.evidence.every((id) => f.clues.some((x) => x.id === id)) ||
+        (a.stage === "investigate" && a.evidence.length >= f.clues.length) ||
+        (a.stage !== "investigate" && a.evidence.length !== f.clues.length) ||
+        (a.stage === "combat") !==
+          (isObject(v.combat) && v.combat.kind === "court")
+      )
+        return false;
+    }
+  }
   if (v.sect !== undefined) {
     const t = v.sect;
     if (
@@ -228,6 +288,12 @@ export function validState(v: unknown): v is GameState {
   )
     return false;
   if (
+    !Number.isInteger(v.identity.rank) ||
+    Number(v.identity.rank) < 0 ||
+    Number(v.identity.rank) > 4
+  )
+    return false;
+  if (
     ![
       "locked",
       "available",
@@ -287,7 +353,26 @@ export function validState(v: unknown): v is GameState {
       !c.logs.every((l) => typeof l === "string")
     )
       return false;
-    if (c.kind !== undefined && c.kind !== "trial") return false;
+    if (c.kind !== undefined && c.kind !== "trial" && c.kind !== "court")
+      return false;
+    if (c.kind === "court") {
+      if (
+        !isObject(v.court) ||
+        !isObject(v.court.active) ||
+        v.court.active.stage !== "combat"
+      )
+        return false;
+      const f = courtCase(String(v.court.active.id));
+      if (
+        !f ||
+        c.maxHp !== f.hp ||
+        !Number.isInteger(c.round) ||
+        Number(c.round) < 1 ||
+        Number(c.hp) <= 0 ||
+        Number(c.hp) > f.hp
+      )
+        return false;
+    }
     if (
       c.kind === "trial" &&
       (!isObject(v.trial) ||
@@ -303,12 +388,16 @@ export function validState(v: unknown): v is GameState {
       return false;
   }
   const trialCombat = isObject(v.combat) && v.combat.kind === "trial";
+  const courtCombat = isObject(v.combat) && v.combat.kind === "court";
   if (
     trialCombat &&
     !["locked", "available", "completed", "failed"].includes(String(q.stage))
   )
     return false;
-  if ((q.stage === "combat") !== (v.combat !== null && !trialCombat))
+  if (
+    (q.stage === "combat") !==
+    (v.combat !== null && !trialCombat && !courtCombat)
+  )
     return false;
   return true;
 }
@@ -327,6 +416,7 @@ export function parseSave(raw: string): SaveRecord {
   if (!s.battle) s.battle = initialBattle();
   if (!s.living) s.living = initialLiving();
   if (!s.sect) s.sect = initialSect(s.trial.highest);
+  if (!s.court) s.court = initialCourt();
   if (!s.player.gender) {
     s.player.gender = "male";
     s.flags.appearance_chosen = false;

@@ -1,6 +1,7 @@
 import { autoDecision } from "../engine/autobattle";
 import { realms } from "../engine/cultivation";
 import { trialFloors } from "../data/trial";
+import { courtCase } from "../data/court";
 import { trialIntent } from "../engine/trial";
 import { useGame } from "../store";
 import { Icon, Portrait, Button, Meter, Modal } from "../components/UI";
@@ -45,6 +46,7 @@ export function Combat({ s }: { s: GameState }) {
   const c = s.combat!,
     d = derived(s);
   const trial = c.kind === "trial" ? trialFloors[c.floor! - 1] : null;
+  const court = c.kind === "court" ? courtCase(s.court.active?.id) : null;
   const intent = trial ? trialIntent(trial.floor, c.round) : null;
   const [paused, setPaused] = useState(c.round > 1 || document.hidden);
   const decision = autoDecision(s, d.maxHp);
@@ -85,7 +87,13 @@ export function Combat({ s }: { s: GameState }) {
   }, [c.round, c.hp, s.player.hp]);
   return (
     <Modal
-      title={trial ? `问心试炼 · 第${trial.floor}层` : "旧码头 · 交锋"}
+      title={
+        trial
+          ? `问心试炼 · 第${trial.floor}层`
+          : court
+            ? `${court.title} · 交锋`
+            : "旧码头 · 交锋"
+      }
       wide
     >
       <div className="combat-round">
@@ -109,10 +117,13 @@ export function Combat({ s }: { s: GameState }) {
           交<br />锋
         </span>
         <div>
-          {trial ? (
-            <div className="trial-opponent" aria-label={trial.name}>
-              <Icon name={trial.boss ? "shield" : "swords"} />
-              <span>{trial.boss ? "守关" : "试剑"}</span>
+          {trial || court ? (
+            <div
+              className="trial-opponent"
+              aria-label={court?.target || trial?.name}
+            >
+              <Icon name={court || trial?.boss ? "shield" : "swords"} />
+              <span>{court ? "缉捕" : trial?.boss ? "守关" : "试剑"}</span>
             </div>
           ) : (
             <CombatPortrait
@@ -121,21 +132,25 @@ export function Combat({ s }: { s: GameState }) {
               round={pulse?.round ?? c.round}
             />
           )}
-          <h3>{trial ? trial.name : "顾红绫 · 八品"}</h3>
+          <h3>{trial ? trial.name : court ? court.target : "顾红绫 · 八品"}</h3>
           <Meter label="气血" value={c.hp} max={c.maxHp} color="red" />
           <p className="small muted">
-            {trial
-              ? `${trial.style} · 防御 ${trial.defense}`
-              : "身轻如燕 · 每三回合使出燕返"}
+            {court
+              ? `拒捕交锋 · 防御 ${court.defense}`
+              : trial
+                ? `${trial.style} · 防御 ${trial.defense}`
+                : "身轻如燕 · 每三回合使出燕返"}
           </p>
         </div>
       </div>
       <p className="combat-intent">
-        {intent
-          ? `敌方意图：${intent.label}（基础伤害 ${intent.power}）· ${intent.hint}`
-          : c.round % 3 === 0
-            ? "敌方意图：燕返重击（基础 44）· 宜防守或轻功闪避"
-            : "敌方意图：试探进攻（基础 32）· 防御会抵消部分伤害"}
+        {court
+          ? `敌方意图：${c.round % 3 === 0 ? "蓄力重击" : "试探进攻"}（基础伤害 ${Math.floor(court.attack * (c.round % 3 === 0 ? 1.4 : 1))}）· 重击宜防御或轻功闪避`
+          : intent
+            ? `敌方意图：${intent.label}（基础伤害 ${intent.power}）· ${intent.hint}`
+            : c.round % 3 === 0
+              ? "敌方意图：燕返重击（基础 44）· 宜防守或轻功闪避"
+              : "敌方意图：试探进攻（基础 32）· 防御会抵消部分伤害"}
       </p>
       {c.advantage && (
         <p className="trial-advantage">反击机会已就绪 · 下一次攻击伤害 +50%</p>

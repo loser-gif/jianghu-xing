@@ -17,6 +17,7 @@ const pages: [Page, string, string][] = [
   ["npc", "人物与羁绊", "users"],
   ["map", "天下舆图", "map"],
   ["quest", "委托与案卷", "scroll"],
+  ["court", "朝廷案牍", "shield"],
   ["identity", "身份司簿", "shield"],
   ["journal", "江湖手记", "feather"],
 ];

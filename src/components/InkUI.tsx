@@ -3,6 +3,7 @@ import { useDialog } from "./useDialog";
 import { PlayerPortrait } from "./PlayerPortrait";
 import { npcRealms } from "../engine/cultivation";
 import { artUrl } from "../artAssets";
+import { officialRanks } from "../data/court";
 import type { ReactNode } from "react";
 import {
   ArrowLeft,
@@ -738,11 +739,7 @@ export function Equipment({
           <h2>
             {s.player.name}
             <span className="seal small-seal">
-              {s.identity.rank >= 2
-                ? "资深捕快"
-                : s.identity.rank
-                  ? "捕快"
-                  : "侠客"}
+              {officialRanks[s.identity.rank]}
             </span>
           </h2>
           <p>器甲在身，行走更稳</p>

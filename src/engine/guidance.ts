@@ -17,6 +17,13 @@ export function recommend(s: GameState): Recommendation {
       button: "回看江湖经历",
       page: "journal",
     };
+  if (s.court.active)
+    return {
+      title: "先推进朝廷案卷",
+      text: "按案牍中的证据清单调查，两份证据齐全后拦截目标。战胜后还需返回官府结案。",
+      button: "查看在办案卷",
+      page: "court",
+    };
   if (
     [
       "prepare",

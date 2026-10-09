@@ -39,6 +39,12 @@ export function Quest({
   return (
     <>
       <CommissionBoard s={s} navigate={navigate} />
+      <ActionRow
+        icon="shield"
+        title="朝廷案牍 · 后续案件"
+        description="资深捕快查漕银，总捕辨伪诏，锦衣卫追密函"
+        onClick={() => navigate("court")}
+      />
       <div className="case-heading">
         <div>
           <span className="eyebrow">杭州官府 · 缉捕案卷 · 壹</span>
@@ -122,7 +128,7 @@ export function Quest({
             ].includes(st) && (
               <p className="small muted">
                 剩余追缉时间：{Math.max(0, 48 - (s.time - s.quest.acceptedAt))}{" "}
-                个时辰 · 截止前须找到目标
+                时段（每段两时辰）· 截止前须找到目标
               </p>
             )}
           </Section>

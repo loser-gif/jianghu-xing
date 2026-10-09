@@ -7174,6 +7174,67 @@ html {
   max-width: 380px;
   margin: 20px 0;
 }
+.court-result {
+  margin-bottom: 20px;
+  padding: 22px;
+  border: 1px solid #9b947d;
+  background: #72785812;
+}
+.court-page p {
+  line-height: 1.9;
+}
+.court-cases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.court-cases .sect-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.court-cases .button {
+  margin-top: auto;
+}
+.court-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+.court-steps li {
+  border-bottom: 2px solid #b9b3a1;
+  padding: 12px 0;
+  color: #878473;
+}
+.court-steps .reached {
+  color: #425341;
+  border-color: #69795f;
+}
+.court-verdict {
+  display: grid;
+  gap: 12px;
+}
+.court-page .sect-panel > .button + .button {
+  margin-left: 8px;
+}
+.court-page .sect-task h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+@media (max-width: 800px) {
+  .court-cases {
+    grid-template-columns: 1fr;
+  }
+  .court-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .court-result {
+    padding: 16px;
+  }
+}
 .sect-name input {
   min-width: 0;
   padding: 12px;

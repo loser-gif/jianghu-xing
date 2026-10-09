@@ -26,7 +26,9 @@ export function Character({
           <span className="eyebrow">江南行客</span>
           <h1>
             {s.player.name}
-            <Seal>{s.identity.rank ? "捕" : "侠"}</Seal>
+            <Seal>
+              {s.identity.rank >= 3 ? "印" : s.identity.rank ? "捕" : "侠"}
+            </Seal>
           </h1>
           <p>
             {origins.find((o) => o.id === s.player.origin)?.name} ·{" "}

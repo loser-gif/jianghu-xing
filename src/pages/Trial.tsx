@@ -3,6 +3,7 @@ import type { GameState, Page } from "../types";
 import { useGame } from "../store";
 import { derived } from "../engine/game";
 import { trialReward } from "../engine/trial";
+import { timedCase } from "../engine/calendar";
 import { trialFloors, trialExchanges, weaponFits } from "../data/trial";
 import { arts, items } from "../data/world";
 import { Button, Icon } from "../components/UI";
@@ -20,9 +21,7 @@ export function Trial({
     d = derived(s);
   const art = arts.find((a) => a.id === s.activeArt)!;
   const fit = weaponFits[art.id]?.includes(s.equipped.weapon);
-  const busy = !["locked", "available", "completed", "failed"].includes(
-    s.quest.stage,
-  );
+  const busy = timedCase(s);
   const reason = s.life.ended
     ? "此生已结卷，可回看人物与手记"
     : selected > s.trial.highest + 1

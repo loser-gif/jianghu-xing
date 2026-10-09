@@ -1,5 +1,8 @@
 import { professions, professionRank, rankNames } from "../data/living";
 import { sectInfo, sectTitle } from "../engine/sect";
+import { officialRanks } from "../data/court";
+import { officialNeeds } from "../engine/court";
+import { timedCase } from "../engine/calendar";
 import { useGame } from "../store";
 import { stageLabels } from "../data/world";
 import { Icon, Button, Section, ActionRow } from "../components/UI";
@@ -14,19 +17,16 @@ export function Identity({
 }) {
   const act = useGame((x) => x.act);
   const at = s.location === "office";
+  const needs = officialNeeds(s);
   return (
     <>
       <div className="identity-hero">
-        <div className="official-seal">捕</div>
+        <div className="official-seal">
+          {s.identity.rank >= 3 ? "印" : "捕"}
+        </div>
         <div>
           <span className="eyebrow">杭州官府</span>
-          <h1>
-            {s.identity.rank === 2
-              ? "资深捕快"
-              : s.identity.rank
-                ? "捕快"
-                : "江湖游侠"}
-          </h1>
+          <h1>{officialRanks[s.identity.rank]}</h1>
           <p>
             {s.identity.rank
               ? "一身公服，护一城安宁。"
@@ -47,7 +47,7 @@ export function Identity({
       </Section>
       <Section title="师门身份 · 可与公门并行">
         <p>
-          {sectInfo(s)?.name || "无门无派"} · {sectTitle(s)}
+          {sectInfo(s) ? `${sectInfo(s)!.name} · ${sectTitle(s)}` : "无门无派"}
         </p>
         <Button onClick={() => navigate("sect")}>查看宗门与传承</Button>
       </Section>
@@ -58,13 +58,11 @@ export function Identity({
               <span>{i < 2 ? "捕" : "印"}</span>
               <b>{n}</b>
               <small>
-                {i >= 2
-                  ? "后续篇章"
-                  : s.identity.rank === i + 1
-                    ? "当前身份"
-                    : s.identity.rank > i + 1
-                      ? "已历任"
-                      : "待晋升"}
+                {s.identity.rank === i + 1
+                  ? "当前身份"
+                  : s.identity.rank > i + 1
+                    ? "已历任"
+                    : "待晋升"}
               </small>
             </div>
           ))}
@@ -114,17 +112,26 @@ export function Identity({
         >
           {at ? "接过腰牌，入职捕快" : "前往官府，拜见陆捕头"}
         </Button>
-      ) : s.identity.rank === 1 ? (
+      ) : s.identity.rank < 4 ? (
         <>
           <p className="selection-note">
-            晋升资深捕快：官府贡献 {s.identity.contribution}/40 · 身份声望{" "}
-            {s.identity.reputation}/25
+            下一阶：{officialRanks[s.identity.rank + 1]}。晋升不扣官府贡献。
           </p>
+          <ul className="sect-requirements">
+            {needs.map((n) => (
+              <li className={n.met ? "met" : ""} key={n.text}>
+                <Icon name={n.met ? "check" : "circle"} size={15} />
+                {n.text}
+              </li>
+            ))}
+          </ul>
+          {timedCase(s) && <p>请先处理当前案件，再申请晋升。</p>}
           <Button
             kind="ink"
             className="full"
             disabled={
-              at && (s.identity.contribution < 40 || s.identity.reputation < 25)
+              s.life.ended ||
+              (at && (timedCase(s) || !needs.every((n) => n.met)))
             }
             onClick={() => {
               if (!at) {
@@ -133,14 +140,22 @@ export function Identity({
               } else act({ type: "promote" });
             }}
           >
-            {at ? "申请晋升 · 资深捕快" : "前往官府交验身份"}
+            {at
+              ? `申请晋升 · ${officialRanks[s.identity.rank + 1]}`
+              : "前往官府交验身份"}
           </Button>
         </>
       ) : (
         <p className="selection-note">
-          你已晋升资深捕快，达到杭州篇的职业目标。总捕与锦衣卫之路，将在后续篇章展开。
+          你已进入锦衣卫。朝廷案牍中的《江南密函》已经向你开放，可继续查办大案。
         </p>
       )}
+      <ActionRow
+        icon="shield"
+        title="朝廷案牍"
+        description="领取俸银、调查新案，推进总捕与锦衣卫之路"
+        onClick={() => navigate("court")}
+      />
       <ActionRow
         icon="scroll"
         title="烟雨楼盗案"

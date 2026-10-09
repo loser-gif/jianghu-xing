@@ -1,5 +1,6 @@
 import { Living } from "./pages/Living";
 import { Sect } from "./pages/Sect";
+import { Court } from "./pages/Court";
 import { CalendarPage, LifeEnding } from "./pages/Calendar";
 import { DesktopNav } from "./components/DesktopNav";
 import { Trial } from "./pages/Trial";
@@ -40,6 +41,7 @@ import { meets } from "./engine/game";
 import type { NPC, Item, Page } from "./types";
 
 const titles: Record<Page, [string, string]> = {
+  court: ["朝廷案牍", "察事明理，守一方清平"],
   sect: ["宗门志", "师承有来处，薪火自相传"],
   living: ["百业生活", "一技立身，烟火亦江湖"],
   calendar: ["岁时录", "看年岁流转，惜此生光阴"],
@@ -169,6 +171,7 @@ export default function App() {
             onStart={() => setScreen("create")}
             onContinue={() => {
               if (s.combat?.kind === "trial") navigate("trial");
+              else if (s.court.active) navigate("court");
               setScreen("game");
             }}
             onSave={() => setSaveOpen(true)}
@@ -330,6 +333,7 @@ export default function App() {
                   {page === "guide" && <Guide s={s} navigate={navigate} />}
                   {page === "living" && <Living s={s} navigate={navigate} />}
                   {page === "sect" && <Sect s={s} navigate={navigate} />}
+                  {page === "court" && <Court s={s} navigate={navigate} />}
                   {page === "calendar" && (
                     <CalendarPage s={s} navigate={navigate} />
                   )}
@@ -341,6 +345,7 @@ export default function App() {
                     ["guide", "江湖路引"],
                     ["living", "百业生活"],
                     ["sect", "宗门与传承"],
+                    ["court", "朝廷案牍"],
                     ["calendar", "岁时与寿元"],
                     ["trial", "试炼塔"],
                     ["character", "我的人物"],
